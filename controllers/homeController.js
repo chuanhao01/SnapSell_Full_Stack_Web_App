@@ -1,3 +1,6 @@
+// This file contains controllers pertaining to:
+// Home pages, those that are attached to / or similar
+
 const homeController = {
     // Function to call to intialise all routes and controlers
     init(app){
