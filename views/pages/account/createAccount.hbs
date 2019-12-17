@@ -107,7 +107,8 @@
                     )
                     .then(
                         function(res){
-                            console.log(res);
+                            // If account creation is successful, redirect to login page
+                            window.location.pathname = '/login';
                         }
                     );
             },

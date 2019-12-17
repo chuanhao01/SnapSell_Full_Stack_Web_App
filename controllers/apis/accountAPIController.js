@@ -47,8 +47,12 @@ const accountAPIController = {
                 }
                 // If there is no error in uploading the file
                 // Creating the new user now
-                dataAccess.user.createANewUser(req.file.filename, req.body.username, req.body.password);
-                res.send(req.body);
+                dataAccess.user.createANewUser(req.file.filename, req.body.username, req.body.password)
+                    .then(
+                        function(){
+                            res.status(200).send({'Result': 'User successfully created'});
+                        }
+                    );
             });
         });
     }

@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/chuanhao01/Full_Stack_Web_App#readme",
   "dependencies": {
+    "bcrypt": "^3.0.7",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "express-handlebars": "^3.1.0",

@@ -14,6 +14,7 @@ const pool = mysql.createPool({
 
 // Importing the other db interface in the folder
 const userDB = require('./usersDB');
+userDB.init(pool);
 
 // Setting up the main object to export to access the db
 const dataAccess = {
