@@ -31,6 +31,20 @@
         {{{body}}}
     </main> 
 
+    <!-- Utility functions -->
+    <script>
+        function formatMB(bytes, decimals = 6) {
+            if (bytes === 0) return '0 Bytes';
+
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const i = 2
+
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
+        }  
+
+    </script>
+
     {{{_sections.scripts}}}
 </body>
 
