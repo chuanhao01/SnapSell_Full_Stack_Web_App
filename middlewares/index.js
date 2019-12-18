@@ -4,11 +4,13 @@
 // Importing the other middlewares
 const userAuth = require('./userAuth');
 const pathAuth = require('./pathAuth');
+const addResUser = require('./addResUser');
 
 const middlewares = {
     init(app){
         app.use(userAuth);
         app.use(pathAuth);
+        app.use(addResUser);
     }
 };
 

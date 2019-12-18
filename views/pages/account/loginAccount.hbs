@@ -72,7 +72,7 @@
                             console.log(res.data);
                             document.cookie = 'access_token=' + res.data.access_token;
                             document.cookie = 'refresh_token=' + res.data.refresh_token;
-                            window.location.pathname = '/random';
+                            window.location.pathname = '/user/home';
                             // Redirect to home page
                             //window.location.pathname = '/';
                         }
