@@ -10,11 +10,6 @@ const homeController = {
                 'title': 'SnapSell Home page',
             });
         });
-        app.get('/random', function(req, res){
-            res.render(parentDir + 'homeLandingPage', {
-                'title': 'SnapSell Home page',
-            });
-        });
     }
 };
 

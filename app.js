@@ -35,11 +35,6 @@ app.use(cookieParser(COOKIE_SECRET));
 const middlewares = require('./middlewares/index');
 middlewares.init(app);
 
-app.use(function(req, res, next){
-    console.log('Logging');
-    next();
-});
-
 // Setting up controllers
 const controllers = require('./controllers/index');
 controllers.init(app);

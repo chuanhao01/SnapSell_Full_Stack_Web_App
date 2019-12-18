@@ -80,6 +80,27 @@ const userDB = {
             });
         });
     },
+    getUserByUserId(user_id){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT * FROM USERS
+            WHERE user_id = ? 
+            `, [user_id], function(err, data){
+                if(err){
+                    // If there is SQL errors
+                    return reject(err);
+                }
+                else if(data.length === 0){
+                    const err = new Error('User does not exist');
+                    err.code = 'USER_NOT_EXIST';
+                    return reject(err);
+                }
+                else{
+                    return resolve(data[0]);
+                }
+            });
+        });
+    },
     getUserByRefreshToken(refresh_token){
         return new Promise((resolve, reject) => {
             this.pool.query(`

@@ -2,7 +2,7 @@
 // The function to check if the path the user is going to is possible
 
 const whitelisted_paths = [
-    '/random',
+    '/',
     '/login',
     '/account/create',
     '/api/account',
