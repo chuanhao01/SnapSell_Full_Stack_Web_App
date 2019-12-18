@@ -62,13 +62,15 @@
                     .post('/api/login', this.form)
                     .catch(
                         function(err){
-                            console.error(err);
+                            console.error(err.response);
                             return;
                         }
                     )
                     .then(
                         function(res){
-                            console.log(res);
+                            console.log(res.data);
+                            document.cookie = 'access_token=' + res.data.access_token;
+                            document.cookie = 'refresh_token=' + res.data.refresh_token;
                         }
                     );
             },
