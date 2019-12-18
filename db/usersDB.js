@@ -54,6 +54,84 @@ const userDB = {
                 });
             }.bind(this)
         );
+    },
+    // Get the user by the username from the db, returns the whole user
+    getUserByUsername(username){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT * FROM USERS
+            WHERE username = ?
+            `, [username], function(err, data){
+                if(err){
+                    // If there is SQL errors
+                    return reject(err);
+                }
+                else if(data.length === 0){
+                    const err = new Error('User does not exist');
+                    err.code = 'USER_NOT_EXIST';
+                    return reject(err);
+                }
+                else if(data.length > 1){
+                    const err = new Error('Too many users');
+                    err.code = 'MANY_USERS';
+                    return reject(err);
+                }
+                return resolve(data[0]);
+            });
+        });
+    },
+    getUserByUserId(user_id){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT * FROM USERS
+            WHERE user_id = ? 
+            `, [user_id], function(err, data){
+                if(err){
+                    // If there is SQL errors
+                    return reject(err);
+                }
+                else if(data.length === 0){
+                    const err = new Error('User does not exist');
+                    err.code = 'USER_NOT_EXIST';
+                    return reject(err);
+                }
+                else{
+                    return resolve(data[0]);
+                }
+            });
+        });
+    },
+    getUserByRefreshToken(refresh_token){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT * FROM USERS
+            WHERE refresh_token = ? 
+            `, [refresh_token], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else if(data.length === 0){
+                    const err = new Error('Invalid refresh token');
+                    err.code = 'INVALID_TOKEN';
+                    reject(err);
+                }
+                else{
+                    resolve(data[0]);
+                }
+            });
+        });
+    },
+    checkPassword(password, password_hash){
+        return new Promise((resolve, reject) => {
+            // Compares the two values
+            bcrypt.compare(password, password_hash, function(err, same){
+                if(err){
+                    return reject(err);
+                }
+                // If there are no errs, returns bool if they are the same
+                return resolve(same);
+            });
+        });
     }
 };
 
