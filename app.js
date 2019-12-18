@@ -26,7 +26,19 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
+// Setting up cookie parser
+const cookieParser = require('cookie-parser');
+const COOKIE_SECRET = process.env.COOKIE_SECRET;
+app.use(cookieParser(COOKIE_SECRET));
+
 // Setting up middlewares
+const middlewares = require('./middlewares/index');
+middlewares.init(app);
+
+app.use(function(req, res, next){
+    console.log('Logging');
+    next();
+});
 
 // Setting up controllers
 const controllers = require('./controllers/index');

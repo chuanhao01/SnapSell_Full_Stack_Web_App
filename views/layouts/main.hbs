@@ -43,6 +43,28 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
         }  
 
+        function checkRefreshToken(){
+            if(window.location.pathname === '/error/403'){
+                axios
+                    .get('/api/refresh_token')
+                    .catch(
+                        function(err){
+                            // If there was an error
+                            console.log(err.response);
+                        }
+                    )
+                    .then(
+                        function(res){
+                            // If the request was successful, set the access token and try again
+                            document.cookie = 'access_token=' + res.data.access_token + '; path=/';
+                            window.location.href = window.location.origin;
+                        }
+                    );
+            }
+        }
+
+        checkRefreshToken();
+
     </script>
 
     {{{_sections.scripts}}}

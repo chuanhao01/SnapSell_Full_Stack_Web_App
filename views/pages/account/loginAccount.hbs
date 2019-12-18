@@ -68,9 +68,13 @@
                     )
                     .then(
                         function(res){
+                            // Setting cookies if login is successful
                             console.log(res.data);
                             document.cookie = 'access_token=' + res.data.access_token;
                             document.cookie = 'refresh_token=' + res.data.refresh_token;
+                            window.location.pathname = '/random';
+                            // Redirect to home page
+                            //window.location.pathname = '/';
                         }
                     );
             },

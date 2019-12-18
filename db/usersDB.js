@@ -80,6 +80,26 @@ const userDB = {
             });
         });
     },
+    getUserByRefreshToken(refresh_token){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT * FROM USERS
+            WHERE refresh_token = ? 
+            `, [refresh_token], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else if(data.length === 0){
+                    const err = new Error('Invalid refresh token');
+                    err.code = 'INVALID_TOKEN';
+                    reject(err);
+                }
+                else{
+                    resolve(data[0]);
+                }
+            });
+        });
+    },
     checkPassword(password, password_hash){
         return new Promise((resolve, reject) => {
             // Compares the two values
