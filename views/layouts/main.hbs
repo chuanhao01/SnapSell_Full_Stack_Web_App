@@ -26,7 +26,24 @@
         <b-navbar type='dark' class="bg-secondary">
             <b-navbar-brand>SnapSell</b-navbar-brand>
             {{#if user}}
+            <b-navbar-nav class="ml-auto">
+                <b-nav-item-dropdown text="Profile">
+                    <b-dropdown-item href="#">View your profile</b-dropdown-item>
+                    <b-dropdown-item href="#">Edit your profile</b-dropdown-item>
+                </b-nav-item-dropdown>                
+                <b-nav-item-dropdown text="Listings">
+                    <b-dropdown-item href="#">View your Listings</b-dropdown-item>
+                    <b-dropdown-item href="#">View other listings</b-dropdown-item>
+                </b-nav-item-dropdown>                
+                <b-button class="btn btn-danger ml-2" id="logoutBtn">
+                    Logout
+                </b-button>
+            </b-navbar-nav>
             {{else}}
+            <b-navbar-nav class="ml-auto">
+                <b-nav-item href="/login">Login</b-nav-item>
+                <b-nav-item href="/account/create">Create an account</b-nav-item>
+            </b-navbar-nav>
             {{/if}}
         </b-navbar>
 
@@ -44,7 +61,7 @@
 
             return parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
         }  
-
+        // Custom function to reload access token when it is expired or missing
         function checkRefreshToken(){
             if(window.location.pathname === '/error/403'){
                 axios
@@ -53,6 +70,10 @@
                         function(err){
                             // If there was an error
                             console.log(err.response);
+                            if(err.response.data.error_code === 'NO_TOKEN'){
+                                // If the error was that they have no refresh and access token
+                                window.location.pathname = '/login';
+                            }
                         }
                     )
                     .then(
@@ -62,6 +83,25 @@
                             window.location.href = window.location.origin;
                         }
                     );
+            }
+        }
+        // Function to clear out all existing cookies
+        function deleteAllCookies() {
+            var cookies = document.cookie.split(";");
+
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i];
+                var eqPos = cookie.indexOf("=");
+                var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                // console.log(name);
+                document.cookie = name + "=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            }
+            console.log('done');
+        }
+        // Custom function for loging out 
+        function logout(){
+            if(document.getElementById('logoutBtn')){
+                return;
             }
         }
 
