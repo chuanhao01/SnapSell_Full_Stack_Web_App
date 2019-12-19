@@ -16,6 +16,12 @@ const accountController = {
                 title: 'Login Page',
             });
         });
+        // Logout
+        app.get('/logout', function(req, res){
+            res.render(parentDir + 'logoutAccount', {
+                'title': 'Logout'
+            });
+        });
     },
 };
 
