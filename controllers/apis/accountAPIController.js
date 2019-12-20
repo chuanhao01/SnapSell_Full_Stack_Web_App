@@ -67,7 +67,7 @@ const accountAPIController = {
                     .then(
                         function(){
                             // If creating a user is successful
-                            res.status(200).send({'Result': 'User successfully created'});
+                            res.status(201).send({'Result': 'User successfully created'});
                         }
                     );
                 }
