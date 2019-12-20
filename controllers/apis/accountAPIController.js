@@ -57,6 +57,7 @@ const accountAPIController = {
                             'Error': 'Multer error',
                             'error_code': err.code
                         });
+                        return;
                     }
                 }
                 else{
