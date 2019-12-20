@@ -37,7 +37,21 @@ const assignmentAPIController= {
     init(app){
         // Q1 GET /users`
         app.get('/users', function(req, res){
-            dataAccess.assignment.getUsers()
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.assignment.getUsers()
+                    .catch(
+                        function(err){
+                            if(err){
+                                res.status(500).send({
+                                    'Condition': 'Unknown error',
+                                    'Code': '500 Internal Server Error'
+                                });
+                            }
+                        }
+                    )
+                );
+            })
             .then(
                 function(users){
                     res.status(200).send(users);
@@ -45,12 +59,7 @@ const assignmentAPIController= {
             )
             .catch(
                 function(err){
-                    if(err){
-                        res.status(500).send({
-                            'Condition': 'Unknown error',
-                            'Code': '500 Internal Server Error'
-                        });
-                    }
+                    console.log('Final catch err: ' + err);
                 }
             );
         });
@@ -67,13 +76,32 @@ const assignmentAPIController= {
                 else{
                     // If there is no error in uploading the file
                     // Creating the new user now
-                    dataAccess.assignment.postUsers(req.file.filename, req.body.username, req.body.password)
+                    new Promise((resolve) => {
+                        resolve(
+                            dataAccess.assignment.postUsers(req.file.filename, req.body.username, req.body.password)
+                            .catch(
+                                function(err){
+                                    console.log(err);
+                                    res.status(500).send({
+                                        'Condition': 'Unknown error',
+                                        'Code': '500 Internal Server Error'
+                                    });
+                                    throw 'POSTUSERS_DB_ERR';
+                                }
+                            )
+                        );
+                    })
                     .then(
                         function(user_id){
                             // If creating a user is successful
                             res.status(201).send({
                                 'user_id': user_id
                             });
+                        }
+                    )
+                    .catch(
+                        function(err){
+                            console.log('Final catch err: ' + err);
                         }
                     );
                 }
@@ -82,7 +110,21 @@ const assignmentAPIController= {
         // Q3 GET /users/:id
         app.get('/users/:id', function(req, res){
             const user_id = req.params.id;
-            dataAccess.assignment.getUsersId(user_id)
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.assignment.getUsersId(user_id)
+                    .catch(
+                        function(err){
+                            if(err){
+                                res.status(500).send({
+                                        'Condition': 'Unknown error',
+                                        'Code': '500 Internal Server Error'
+                                });
+                            }
+                        }
+                    )
+                );
+            })
             .then(
                 function(user){
                     // Got the user
@@ -91,12 +133,7 @@ const assignmentAPIController= {
             )
             .catch(
                 function(err){
-                    if(err){
-                        res.status(500).send({
-                                'Condition': 'Unknown error',
-                                'Code': '500 Internal Server Error'
-                        });
-                    }
+                    console.log('Final catch err: ' + err);
                 }
             );
         });
