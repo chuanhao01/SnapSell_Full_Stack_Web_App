@@ -20,6 +20,7 @@ const assignmentDB = {
     init(pool){
         this.pool = pool;
     },
+    // Q1 GET /users`
     getUsers(){
         return new Promise((resolve, reject) => {
             this.pool.query(`
@@ -34,6 +35,7 @@ const assignmentDB = {
             });
         });
     },
+    // Q2 POST /users
     postUsers(avatar_icon_file_name, username, password){
         return new Promise(async (resolve, reject) => {
             // First part here is to generate all the corrosponding data fields
@@ -74,6 +76,22 @@ const assignmentDB = {
                 });
             }.bind(this)
         ); 
+    },
+    // Q3 GET /users/:id
+    getUsersId(user_id){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT * FROM USERS
+            WHERE user_id = ? 
+            `, [user_id], function(err, data){
+                if(err || data.length === 0){
+                    reject('MySQL error');
+                }
+                else{
+                    resolve(data[0]);
+                }
+            });
+        });
     }
 };
 

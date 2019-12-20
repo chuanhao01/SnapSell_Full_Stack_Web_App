@@ -35,6 +35,7 @@ const dataAccess = require('../../db/index');
 
 const assignmentAPIController= {
     init(app){
+        // Q1 GET /users`
         app.get('/users', function(req, res){
             dataAccess.assignment.getUsers()
             .then(
@@ -53,6 +54,7 @@ const assignmentAPIController= {
                 }
             );
         });
+        // Q2 POST /users
         app.post('/users', function(req, res){
             upload(req, res, function(err){
                 // Cataching errors in the file uploaded
@@ -76,6 +78,27 @@ const assignmentAPIController= {
                     );
                 }
             });
+        });
+        // Q3 GET /users/:id
+        app.get('/users/:id', function(req, res){
+            const user_id = req.params.id;
+            dataAccess.assignment.getUsersId(user_id)
+            .then(
+                function(user){
+                    // Got the user
+                    res.status(200).send(user);
+                }
+            )
+            .catch(
+                function(err){
+                    if(err){
+                        res.status(500).send({
+                                'Condition': 'Unknown error',
+                                'Code': '500 Internal Server Error'
+                        });
+                    }
+                }
+            );
         });
     }
 };
