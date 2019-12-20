@@ -28,11 +28,10 @@ const userDB = {
                 algorithm: 'HS256',
             }, function(err, token){
                 if(err){
-                    console.error(err);
-                    return reject(err);
+                    reject(err);
                 }
                 // If all are successful in generating, resolve with all generated data
-                return resolve([user_id, password_hash, token]);
+                resolve([user_id, password_hash, token]);
             });
         })
         .then(
