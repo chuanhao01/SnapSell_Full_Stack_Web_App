@@ -60,12 +60,6 @@
                 // Post request sent here
                 axios
                     .post('/api/login', this.form)
-                    .catch(
-                        function(err){
-                            console.error(err.response);
-                            return;
-                        }
-                    )
                     .then(
                         function(res){
                             // Setting cookies if login is successful
@@ -75,6 +69,12 @@
                             window.location.pathname = '/user/home';
                             // Redirect to home page
                             //window.location.pathname = '/';
+                        }
+                    )
+                    .catch(
+                        function(err){
+                            console.error(err.response);
+                            return;
                         }
                     );
             },

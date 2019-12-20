@@ -15,40 +15,60 @@ const userDB = {
     },
     // Main function for actions in the db below
     createANewUser(avatar_icon_file_name, username, password){
-        return new Promise(async (resolve, reject) => {
-            // First part here is to generate all the corrosponding data fields
-            // Generating userid and password hash
-            const user_id = uuid();
-            const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
-            // Generating the refresh token for user
-            const payload = {
-                'Result': 'This is a refresh token',
-            };
-            jwt.sign(payload, JWT_SECRET, {
-                algorithm: 'HS256',
-            }, function(err, token){
+        return new Promise((resolve, reject) => {
+            // First part here is to generate password hash
+            bcrypt.hash(password, SALT_ROUNDS, function(err, password_hash){
                 if(err){
+                    // If there are any bcrypt errors
                     reject(err);
                 }
-                // If all are successful in generating, resolve with all generated data
-                resolve([user_id, password_hash, token]);
+                else{
+                    // If password_hash was successfully generated
+                    resolve(password_hash);
+                }
             });
         })
         .then(
-            function([user_id, password_hash, token]){
+            function(password_hash){
+                return new Promise((resolve, reject) => {
+                    // Here we will generate the jwt refresh token
+                    const payload = {
+                        'Result': 'This is a refresh token',
+                    };
+                    jwt.sign(payload, JWT_SECRET, {
+                        algorithm: 'HS256',
+                    }, function(err, token){
+                        if(err){
+                            // If there are any jwt errors
+                            reject(err);
+                        }
+                        // If jwt refresh token was successfully generated
+                        resolve([password_hash, token]);
+                    });
+                });
+            }
+        )
+        .then(
+            function([password_hash, refresh_token]){
                 // Now here we are sending a query to the db to create the user
                 // Deleted is given to be 0 on creation
+                // uuid is also only created at the time for insert
                 return new Promise((resolve, reject) => {
+                    const user_id = uuid();
                     this.pool.query(`
                     INSERT INTO USERS
                     (user_id, username, password, avatar_icon_file_name, refresh_token, deleted)
                     values
                     (?, ?, ?, ?, ?, ?)
-                    `, [user_id, username, password_hash, avatar_icon_file_name, token, 0], function(err, data){
+                    `, [user_id, username, password_hash, avatar_icon_file_name, refresh_token, 0], function(err, data){
                         if(err){
-                            return reject(err);
+                            // If there are any MySQL errors
+                            reject(err);
                         }
-                        return resolve(true);
+                        else{
+                            // User is successfully created
+                            resolve(data);
+                        }
                     });
                 });
             }.bind(this)

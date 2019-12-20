@@ -100,6 +100,27 @@ const assignmentAPIController= {
                 }
             );
         });
+        // Q4 PUT /users/:id
+        app.put('/users/:id', function(req, res){
+            const user_id = req.params.id;
+            upload(req, res, function(err){
+                // Cataching errors in the file uploaded
+                if(err){
+                    res.status(500).send({
+                        'Condition': 'Unknown error',
+                        'Code': '500 Internal Server Error'
+                    });
+                }
+                else{
+                    // If there is no error in uploading the file
+                    // Try to update the user
+                    dataAccess.assignment.putUsersId(req.file.filename, req.body.username, req.body.password, user_id)
+                    .then(
+                        
+                    );
+                }
+            });
+        });
     }
 };
 
