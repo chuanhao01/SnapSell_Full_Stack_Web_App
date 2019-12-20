@@ -4,7 +4,7 @@ const accountController = require('./accountController');
 const errorController = require('./errorController');
 const userController = require('./userController');
 
-const accountAPIController = require('./apis/accountAPIController');
+const APIContollers = require('./apis/index');
 
 // Creating the main exported controller object
 const controllers = {
@@ -14,7 +14,7 @@ const controllers = {
         errorController.init(app);
         userController.init(app);
 
-        accountAPIController.init(app);
+        APIContollers.init(app);
     }
 };
 

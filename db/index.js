@@ -14,11 +14,15 @@ const pool = mysql.createPool({
 
 // Importing the other db interface in the folder
 const userDB = require('./usersDB');
+const assignmentDB = require('./assignmentDB');
+
 userDB.init(pool);
+assignmentDB.init(pool);
 
 // Setting up the main object to export to access the db
 const dataAccess = {
     user: userDB,
+    assignment: assignmentDB
 };
 
 module.exports = dataAccess;
