@@ -3,8 +3,6 @@
 
 // Importing other libs
 const path = require('path');
-const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET;
 const multer = require('multer');
 const upload = multer({
     // Setting the destination where the avatar icons are stored
@@ -54,16 +52,24 @@ const accountAPIController = {
                         });
                         return;
                     }
-                }
-                // If there is no error in uploading the file
-                // Creating the new user now
-                dataAccess.user.createANewUser(req.file.filename, req.body.username, req.body.password)
-                .then(
-                    function(){
-                        // If creating a user is successful
-                        res.status(200).send({'Result': 'User successfully created'});
+                    else{
+                        res.status(500).send({
+                            'Error': 'Multer error',
+                            'error_code': err.code
+                        });
                     }
-                );
+                }
+                else{
+                    // If there is no error in uploading the file
+                    // Creating the new user now
+                    dataAccess.user.createANewUser(req.file.filename, req.body.username, req.body.password)
+                    .then(
+                        function(){
+                            // If creating a user is successful
+                            res.status(200).send({'Result': 'User successfully created'});
+                        }
+                    );
+                }
             });
         });
         // Endpoint for logging in
