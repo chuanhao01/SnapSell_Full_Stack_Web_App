@@ -2,12 +2,12 @@
 
 // Importing other API controllers
 const accountAPIController = require('./accountAPIController');
-const assignmentAPI = require('./assignmentAPI');
+const assignmentAPIController = require('./assignmentAPIController');
 
 const APIControllers = {
     init(app){
         accountAPIController.init(app);
-        assignmentAPI.init(app);
+        assignmentAPIController.init(app);
     }
 };
 
