@@ -3,9 +3,9 @@
 
 const errorController = {
     init(app){
-        const parentDir = 'pages/error/';
+        const parent_dir = 'pages/error/';
         app.get('/error/403', function(req, res){
-            res.render(parentDir + '403', {
+            res.render(parent_dir + '403', {
                 'title': '403 error',
             });
         });

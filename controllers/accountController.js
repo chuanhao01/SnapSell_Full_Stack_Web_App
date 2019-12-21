@@ -3,22 +3,22 @@
 
 const accountController = {
     init(app){
-        const parentDir = 'pages/account/';
+        const parent_dir = 'pages/account/';
         // Account creation
         app.get('/account/create', function(req, res){
-            res.render(parentDir + 'createAccount', {
+            res.render(parent_dir + 'createAccount', {
                 'title': 'Create an account'
             }); 
         });
         // Login
         app.get('/login', function(req, res){
-            res.render(parentDir + 'loginAccount', {
+            res.render(parent_dir + 'loginAccount', {
                 title: 'Login Page',
             });
         });
         // Logout
         app.get('/logout', function(req, res){
-            res.render(parentDir + 'logoutAccount', {
+            res.render(parent_dir + 'logoutAccount', {
                 'title': 'Logout'
             });
         });

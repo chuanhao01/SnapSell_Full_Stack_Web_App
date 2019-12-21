@@ -4,9 +4,9 @@
 const homeController = {
     // Function to call to intialise all routes and controlers
     init(app){
-        const parentDir = 'pages/home/';
+        const parent_dir = 'pages/home/';
         app.get('/', function(req, res){
-            res.render(parentDir + 'homeLandingPage', {
+            res.render(parent_dir + 'homeLandingPage', {
                 'title': 'SnapSell Home page',
             });
         });
