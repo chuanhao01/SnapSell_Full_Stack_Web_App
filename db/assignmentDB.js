@@ -270,13 +270,30 @@ const assignmentDB = {
             });
         });
     },
-    // Q8 DELETE /listings/:listing_id
+    // Q9 DELETE /listings/:listing_id
     deleteListings(listing_id){
         return new Promise((resolve, reject) => {
             this.pool.query(`
             DELETE FROM LISTINGS
             WHERE listing_id = ? 
             `, [listing_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
+    },
+    // Q10 PUT /listings/:id
+    putListings(listing_id, title, description, price, listing_user_id){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            UPDATE LISTINGS
+            SET title = ?, description = ?, price = ?, listing_user_id = ?
+            WHERE listing_id = ?
+            `, [title, description, price, listing_user_id, listing_id], function(err, data){
                 if(err){
                     reject(err);
                 }

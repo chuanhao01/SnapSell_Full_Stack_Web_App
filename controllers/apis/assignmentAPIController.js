@@ -315,7 +315,7 @@ const assignmentAPIController= {
                 }
             );
         });
-        // Q8 DELETE /listings/:listing_id
+        // Q9 DELETE /listings/:id
         app.delete('/listings/:id', function(req, res){
             const listing_id = req.params.id;
             new Promise((resolve) => {
@@ -336,6 +336,37 @@ const assignmentAPIController= {
             .then(
                 function(){
                     // If deleting the post was successful
+                    res.status(204).send();
+                }
+            )
+            .catch(
+                function(err){
+                    // Final catch for all errors
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
+        // Q10 PUT /listings/:id
+        app.put('/listings/:id', function(req, res){
+            const listing_id = req.params.id;
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.assignment.putListings(listing_id, req.body.title, req.body.description, req.body.price, req.body.listing_user_id)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Condition': 'Unknown error',
+                                'Code': '500 Internal Server Error'
+                            });
+                            throw 'PUTLISTINGID_DB_ERR';
+                        }
+                    )
+                );
+            })
+            .then(
+                function(){
+                    // If the update was successful
                     res.status(204).send();
                 }
             )
