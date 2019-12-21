@@ -295,7 +295,7 @@ const assignmentAPIController= {
                                 'Condition': 'Unknown error',
                                 'Code': '500 Internal Server Error'
                             });
-                            throw 'GETLISTINGID_DB_ERR';
+                            throw 'POSTLISTINGID_DB_ERR';
                         }
                     )
                 );
@@ -306,6 +306,37 @@ const assignmentAPIController= {
                     res.status(201).send({
                         'listingID': listing_id
                     });
+                }
+            )
+            .catch(
+                function(err){
+                    // Final catch for all errors
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
+        // Q8 DELETE /listings/:listing_id
+        app.delete('/listings/:id', function(req, res){
+            const listing_id = req.params.id;
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.assignment.deleteListings(listing_id)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Condition': 'Unknown error',
+                                'Code': '500 Internal Server Error'
+                            });
+                            throw 'DELETELISTINGID_DB_ERR';
+                        }
+                    )
+                );
+            })
+            .then(
+                function(){
+                    // If deleting the post was successful
+                    res.status(204).send();
                 }
             )
             .catch(

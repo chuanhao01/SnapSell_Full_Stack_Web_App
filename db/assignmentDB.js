@@ -269,6 +269,22 @@ const assignmentDB = {
                 }
             });
         });
+    },
+    // Q8 DELETE /listings/:listing_id
+    deleteListings(listing_id){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            DELETE FROM LISTINGS
+            WHERE listing_id = ? 
+            `, [listing_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
     }
 };
 
