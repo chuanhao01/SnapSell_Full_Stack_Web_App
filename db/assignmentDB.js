@@ -83,7 +83,7 @@ const assignmentDB = {
                     (user_id, username, password, avatar_icon_file_name, refresh_token, deleted)
                     values
                     (?, ?, ?, ?, ?, ?)
-                    `, [user_id, username, password_hash, avatar_icon_file_name, refresh_token, 0], function(err, data){
+                    `, [user_id, username, password_hash, avatar_icon_file_name, refresh_token, 0], function(err){
                         if(err){
                             // If there are any MySQL errors
                             reject(err);
@@ -248,6 +248,28 @@ const assignmentDB = {
             });
         });
     },
+    // Q8 POST /listings
+    postListings(title, description, price, listing_user_id){
+        return new Promise((resolve, reject) => {
+            // Generating the listing_id
+            const listing_id = uuid();
+            // Here availability and delted defaults to 0
+            // Mapping of values can be seen in the markdown
+            this.pool.query(`
+            INSERT INTO LISTINGS
+            (listing_id, title, description, price, listing_user_id, availability, deleted)
+            VALUES
+            (?, ?, ?, ?, ?, ?, ?)           
+            `, [listing_id, title, description, price, listing_user_id, 0, 0], function(err){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(listing_id);
+                }
+            });
+        });
+    }
 };
 
 module.exports = assignmentDB;

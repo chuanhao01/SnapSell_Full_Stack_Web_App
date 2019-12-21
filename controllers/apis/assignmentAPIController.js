@@ -283,6 +283,38 @@ const assignmentAPIController= {
                 }
             );
         });
+        // Q8 POST /listings
+        app.post('/listings', function(req, res){
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.assignment.postListings(req.body.title, req.body.description, req.body.price, req.body.listing_user_id)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Condition': 'Unknown error',
+                                'Code': '500 Internal Server Error'
+                            });
+                            throw 'GETLISTINGID_DB_ERR';
+                        }
+                    )
+                );
+            })
+            .then(
+                function(listing_id){
+                    // If the listing was successfully created 
+                    res.status(201).send({
+                        'listingID': listing_id
+                    });
+                }
+            )
+            .catch(
+                function(err){
+                    // Final catch for all errors
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
     }
 };
 
