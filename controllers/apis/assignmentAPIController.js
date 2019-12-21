@@ -192,6 +192,68 @@ const assignmentAPIController= {
                 }
             });
         });
+        // Q5 GET /users/:user_id/listings
+        app.get('/users/:user_id/listings', function(req, res){
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.assignment.getUsersIdListings(req.params.user_id)
+                    .catch(
+                        function(err){
+                            // If there were any errors getting the listings
+                            console.log(err);
+                            res.status(500).send({
+                                'Condition': 'Unknown error',
+                                'Code': '500 Internal Server Error'
+                            });
+                            throw 'GETUSERSIDLISTINGS_DB_ERR';
+                        }
+                    )
+                );
+            })
+            .then(
+                function(data){
+                    // If the MySQL query was successful
+                    res.status(200).send(data);
+                }
+            )
+            .catch(
+                function(err){
+                    // Final catch for all errors
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
+        // Q6 GET /listings
+        app.get('/listings', function(req, res){
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.assignment.getListings()
+                    .catch(
+                        function(err){
+                            // If there were any errors getting the listings
+                            console.log(err);
+                            res.status(500).send({
+                                'Condition': 'Unknown error',
+                                'Code': '500 Internal Server Error'
+                            });
+                            throw 'GETUSERSIDLISTINGS_DB_ERR';
+                        }
+                    )
+                );
+            })
+            .then(
+                function(data){
+                    // If the MySQL query was successful
+                    res.status(200).send(data);
+                }
+            )
+            .catch(
+                function(err){
+                    // Final catch for all errors
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
     }
 };
 

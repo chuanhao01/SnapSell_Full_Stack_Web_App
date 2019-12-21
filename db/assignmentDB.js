@@ -199,6 +199,37 @@ const assignmentDB = {
                 });
             }.bind(this)
         );       
+    },
+    // Q5 GET /users/:user_id/listings
+    getUsersIdListings(user_id){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT * FROM LISTINGS
+            WHERE listing_user_id = ? 
+            `, [user_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
+    },
+    // Q6 GET /listings
+    getListings(){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT * FROM LISTINGS
+            `, function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
     }
 };
 
