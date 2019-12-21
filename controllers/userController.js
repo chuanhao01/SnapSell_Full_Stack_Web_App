@@ -9,6 +9,7 @@ Here req.user has all the information of the user
 const userController = {
     init(app){
         const parent_dir = 'pages/user/';
+        const listing_parent_dir = parent_dir + 'listings/';
         // users home page
         app.get('/user/home', function(req, res){
             res.render(parent_dir + 'userHome', {
@@ -17,9 +18,11 @@ const userController = {
         });
         // Listings
         // Adding a listing
-        // app.get('/user/listing', function(req, res){
-
-        // });
+        app.get('/user/listing', function(req, res){
+            res.render(listing_parent_dir + 'addListing', {
+                'title': 'Add a listing'
+            });
+        });
     }
 };
 

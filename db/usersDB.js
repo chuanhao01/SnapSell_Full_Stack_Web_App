@@ -1,3 +1,8 @@
+/*
+TODO:
+1. Make sure during creation, no duplicate users
+*/
+
 // This db file contains:
 // Actions pertaining to interacting with the USERS db or interacts with a 'user'
 
@@ -5,6 +10,7 @@
 const uuid = require('uuid/v4');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const SALT_ROUNDS = 13;

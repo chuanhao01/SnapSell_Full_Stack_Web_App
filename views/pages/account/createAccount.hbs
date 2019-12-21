@@ -88,35 +88,36 @@
                 form_data.append('password', this.form.password);
                 // Post request sent here
                 axios
-                    .post('/api/account', form_data, {
-                        headers:{
-                            'Content-Type': 'multipart/form-data'
+                .post('/api/account', form_data, {
+                    headers:{
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+                .catch(
+                    function(err){
+                        if(err.response.status === 422){
+                            // Wrong file extension given
+                            return;
                         }
-                    })
-                    .catch(
-                        function(err){
-                            if(err.response.status === 422){
-                                // Wrong file extension given
-                                return;
-                            }
-                            else if(err.response.status === 413){
-                                // Uploaded file is too large
-                                return;
-                            }
+                        else if(err.response.status === 413){
+                            // Uploaded file is too large
+                            return;
                         }
-                    )
-                    .then(
-                        function(res){
-                            // If account creation is successful, redirect to login page
-                            window.location.pathname = '/login';
-                        }
-                    );
+                    }
+                )
+                .then(
+                    function(res){
+                        // If account creation is successful, redirect to login page
+                        window.location.pathname = '/login';
+                    }
+                );
             },
             // Method called to reset the whole form
             onReset(event){
                 event.preventDefault();
                 this.form.username = '';
                 this.form.password = '';
+                this.form.avatar_icon = null;
                 //This is to reload the form to make it empty
                 this.showForm = false;
                 Vue.nextTick(() => {
