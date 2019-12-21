@@ -95,12 +95,6 @@ const accountAPIController = {
                     new Promise((resolve) => {
                         resolve(
                             dataAccess.user.createANewUser(req.file.filename, req.body.username, req.body.password)
-                            .then(
-                                function(){
-                                    // If creating a user is successful
-                                    res.status(201).send({'Result': 'User successfully created'});
-                                }
-                            )
                             .catch(
                                 function(err){
                                     // If there are any erros deal with it here and raise it to the final catch
@@ -114,6 +108,12 @@ const accountAPIController = {
                             )
                         );
                     })
+                    .then(
+                        function(){
+                            // If creating a user is successful
+                            res.status(201).send({'Result': 'User successfully created'});
+                        }
+                    )
                     .catch(
                         function(err){
                             // Final catch for all errors

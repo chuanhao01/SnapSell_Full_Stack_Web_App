@@ -82,7 +82,17 @@
             onSubmit(event){
                 event.preventDefault();
                 axios
-                .post('/api/')
+                .post('/api/listing', this.form)
+                .catch(
+                    function(err){
+                        console.log(err.response);
+                    }
+                )
+                .then(
+                    function(res){
+                        console.log(res);
+                    }
+                );
             }
         },
     });

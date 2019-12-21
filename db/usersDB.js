@@ -15,7 +15,7 @@ const fs = require('fs');
 const JWT_SECRET = process.env.JWT_SECRET;
 const SALT_ROUNDS = 13;
 
-const userDB = {
+const usersDB = {
     init(pool){
         this.pool = pool;
     },
@@ -160,4 +160,4 @@ const userDB = {
     }
 };
 
-module.exports = userDB;
+module.exports = usersDB;
