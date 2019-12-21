@@ -48,6 +48,7 @@ const assignmentAPIController= {
                                     'Code': '500 Internal Server Error'
                                 });
                             }
+                            throw 'GETUSERS_DB_ERR';
                         }
                     )
                 );
@@ -121,6 +122,7 @@ const assignmentAPIController= {
                                         'Code': '500 Internal Server Error'
                                 });
                             }
+                            throw 'GETUSERSID_DB_ERR';
                         }
                     )
                 );
@@ -151,9 +153,41 @@ const assignmentAPIController= {
                 else{
                     // If there is no error in uploading the file
                     // Try to update the user
-                    dataAccess.assignment.putUsersId(req.file.filename, req.body.username, req.body.password, user_id)
+                    new Promise((resolve) => {
+                        resolve(
+                            dataAccess.assignment.putUserId(req.file.filename, req.body.username, req.body.password, user_id)
+                            .catch(
+                                function(err){
+                                    console.log(err);
+                                    if(err.code === 'USERNAME_TAKEN'){
+                                        // If the user alr exists and there is this error
+                                        res.status(422).send({
+                                            'Condition': 'The new username provided already exists.',
+                                            'Code': '422 Unprocessable Entity'
+                                        });
+                                    }
+                                    else{
+                                        // Any other error
+                                        res.status(500).send({
+                                            'Condition': 'Unknown error',
+                                            'Code': '500 Internal Server Error'
+                                        });
+                                    }
+                                    throw 'PUTUSERSID_DB_ERR';
+                                }
+                            )
+                        );
+                    })
                     .then(
-                        
+                        function(){
+                            // If the update is successful
+                            res.status(204).send();
+                        }
+                    )
+                    .catch(
+                        function(err){
+                            console.log('Final catch err: ' + err);
+                        }
                     );
                 }
             });
