@@ -230,7 +230,24 @@ const assignmentDB = {
                 }
             });
         });
-    }
+    },
+    // Q7 GET /listings/:listing_id
+    getListingId(listing_id){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT * FROM LISTINGS
+            WHERE listing_id = ? 
+            `, [listing_id], function(err, data){
+                if(err || data.length === 0){
+                    // If there was a MySQL error or if no listings were returned
+                    reject('Error in retrieving listing');
+                }
+                else{
+                    resolve(data[0]);
+                }
+            });
+        });
+    },
 };
 
 module.exports = assignmentDB;

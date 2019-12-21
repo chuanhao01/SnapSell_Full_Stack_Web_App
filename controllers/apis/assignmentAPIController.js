@@ -230,13 +230,42 @@ const assignmentAPIController= {
                     dataAccess.assignment.getListings()
                     .catch(
                         function(err){
-                            // If there were any errors getting the listings
                             console.log(err);
                             res.status(500).send({
                                 'Condition': 'Unknown error',
                                 'Code': '500 Internal Server Error'
                             });
-                            throw 'GETUSERSIDLISTINGS_DB_ERR';
+                            throw 'GETLISTINGS_DB_ERR';
+                        }
+                    )
+                );
+            })
+            .then(
+                function(data){
+                    // If the MySQL query was successful
+                    res.status(200).send(data);
+                }
+            )
+            .catch(
+                function(err){
+                    // Final catch for all errors
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
+        // Q7 GET /listings/:listing_id
+        app.get('/listings/:listing_id', function(req, res){
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.assignment.getListingId(req.params.listing_id)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Condition': 'Unknown error',
+                                'Code': '500 Internal Server Error'
+                            });
+                            throw 'GETLISTINGID_DB_ERR';
                         }
                     )
                 );
