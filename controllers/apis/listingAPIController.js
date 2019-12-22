@@ -7,6 +7,7 @@ const dataAccess = require('../../db/index');
 
 const listingAPIController = {
     init(app){
+        // Adding a listing
         app.post('/api/listing', function(req, res){
             new Promise((resolve) => {
                 resolve(
@@ -72,7 +73,64 @@ const listingAPIController = {
                 }
             );
         });
+        // Getting a listing by listing_id
+        app.get('/api/listing/:listing_id', function(req, res){
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.listing.getListingById(req.params.listing_id)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL_ERR',
+                                'error_code': err.code
+                            });
+                            throw 'MySQL_ERR';
+                        }
+                    )
+                );
+            })
+            .then(
+                function(listing){
+                    return new Promise((resolve, reject) => {
+                        if(listing.length === 0){
+                            // If listing is not found
+                            const err = new Error('Listing not found');
+                            err.code = 'LISTING_NOT_FOUND';
+                            reject(err);
+                            
+                        }
+                        else{
+                            resolve(listing[0]);
+                        }
+                    })
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(404).send({
+                                'Error': 'Listing not found',
+                                'error_code': err.code
+                            });
+                        }
+                    );
+                }
+            )
+            .then(
+                function(listing){
+                    // If the listing is found
+                    res.status(200).send({
+                        'listing': listing
+                    });
+                }
+            )
+            .catch(
+                function(err){
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
         // Deleting a listing
+        // TODO: Fix for final version
         app.delete('/api/listing/:listing_id', function(req, res){
             new Promise((resolve) => {
                 resolve(

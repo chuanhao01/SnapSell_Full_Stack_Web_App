@@ -28,6 +28,21 @@ const listingsDB = {
             });
         });
     },
+    getListingById(listing_id){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT * FROM LISTINGS
+            WHERE ((listing_id = ?) AND (deleted = 0)) 
+            `, [listing_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
+    },
     getUserListings(listing_user_id){
         return new Promise((resolve, reject) => {
             this.pool.query(`

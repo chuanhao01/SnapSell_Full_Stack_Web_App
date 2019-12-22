@@ -34,7 +34,7 @@
                                 </article>
                             </b-card-text>
                             <b-card-text>
-                                <b-button variant="primary" href=''>View</b-button>
+                                <b-button variant="primary" :href='`/user/listing/${listing.listing_id}`'>View</b-button>
                                 <b-button variant="warning">Edit</b-button>
                                 <b-button
                                 @click='deleteListing(listing.listing_id)'

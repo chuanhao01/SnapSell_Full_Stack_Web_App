@@ -29,6 +29,12 @@ const userController = {
                 'title': 'Looking at your own listings'
             });
         });
+        // View a specific listing
+        app.get('/user/listing/:listing_id', function(req, res){
+            res.render(listing_parent_dir + 'viewUserSingleListing', {
+                'title': 'Looking at listing'
+            });
+        });
     }
 };
 

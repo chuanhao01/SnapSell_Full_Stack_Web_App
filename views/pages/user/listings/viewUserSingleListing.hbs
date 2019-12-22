@@ -1,0 +1,58 @@
+<main class="container-fluid mt-3">
+    <div class="row">
+        <div class="col-12">
+            <template
+            v-if='listing'>
+                <b-card
+                :title='listing.title'
+                :bg-variant='listing.availability ? "primary" : "success"'>
+                    <b-card-text>
+                        <span class="d-block font-weight-bold">Description</span>
+                        <p>
+                            \{{listing.description}}
+                        </p>
+                    </b-card-text>
+                    <b-card-text>
+                        <article>
+                            <span class="font-weight-bold">Price: </span>
+                            <span>
+                                \{{listing.price}}
+                            </span>
+                        </article>
+                    </b-card-text>
+                </b-card>
+            </template>
+        </div>
+    </div>    
+</main>
+
+{{#section 'scripts'}}
+<script>
+    const app = new Vue({
+        el: '#app',
+        data: {
+            listing: null,
+        },
+        methods: {
+            getListing(){
+                const listing_id = window.location.pathname.split("/").pop();
+                axios
+                .get(`/api/listing/${listing_id}`)
+                .then(
+                    function(res){
+                        this.listing = res.data.listing;
+                    }.bind(this)
+                )
+                .catch(
+                    function(err){
+                        console.log(err.response);
+                    }
+                )
+            }
+        },
+        created(){
+            this.getListing();
+        }
+    });
+</script>
+{{/section}}
