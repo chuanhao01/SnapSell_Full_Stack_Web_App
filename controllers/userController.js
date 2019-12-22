@@ -18,9 +18,15 @@ const userController = {
         });
         // Listings
         // Adding a listing
-        app.get('/user/listing', function(req, res){
+        app.get('/user/listing/add', function(req, res){
             res.render(listing_parent_dir + 'addListing', {
                 'title': 'Add a listing'
+            });
+        });
+        // View all of the user's listings
+        app.get('/user/listing', function(req, res){
+            res.render(listing_parent_dir + 'viewUserListings', {
+                'title': 'Looking at your own listings'
             });
         });
     }

@@ -27,7 +27,23 @@ const listingsDB = {
                 }
             });
         });
-    }
+    },
+    getUserListings(listing_user_id){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT * FROM LISTINGS
+            WHERE listing_user_id = ? 
+            `, [listing_user_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
+    },
+
 };
 
 module.exports = listingsDB;
