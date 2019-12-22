@@ -32,7 +32,7 @@ const listingsDB = {
         return new Promise((resolve, reject) => {
             this.pool.query(`
             SELECT * FROM LISTINGS
-            WHERE listing_user_id = ? 
+            WHERE ((listing_user_id = ?) AND (deleted = 0))
             `, [listing_user_id], function(err, data){
                 if(err){
                     reject(err);
@@ -47,7 +47,7 @@ const listingsDB = {
         return new Promise((resolve, reject) => {
             this.pool.query(`
             SELECT * FROM LISTINGS
-            WHERE ((listing_id = ?) AND (listing_user_id = ?)) 
+            WHERE ((listing_id = ?) AND (listing_user_id = ?) AND (deleted = 0)) 
             `, [listing_id, listing_user_id], function(err, data){
                 if(err){
                     reject(err);
@@ -67,7 +67,8 @@ const listingsDB = {
     deleteAListing(listing_id){
         return new Promise((resolve, reject) => {
             this.pool.query(`
-            DELETE FROM LISTINGS
+            UPDATE LISTINGS
+            SET deleted = 1
             WHERE listing_id = ?
             `, [listing_id], function(err, data){
                 if(err){

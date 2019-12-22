@@ -85,7 +85,7 @@ const usersDB = {
         return new Promise((resolve, reject) => {
             this.pool.query(`
             SELECT * FROM USERS
-            WHERE username = ?
+            WHERE ((username = ?) AND (deleted = 0))
             `, [username], function(err, data){
                 if(err){
                     // If there is SQL errors
@@ -109,7 +109,7 @@ const usersDB = {
         return new Promise((resolve, reject) => {
             this.pool.query(`
             SELECT * FROM USERS
-            WHERE user_id = ? 
+            WHERE ((user_id = ?) AND (deleted = 0)) 
             `, [user_id], function(err, data){
                 if(err){
                     // If there is SQL errors
@@ -130,7 +130,7 @@ const usersDB = {
         return new Promise((resolve, reject) => {
             this.pool.query(`
             SELECT * FROM USERS
-            WHERE refresh_token = ? 
+            WHERE ((refresh_token = ?) AND (deleted = 0))
             `, [refresh_token], function(err, data){
                 if(err){
                     reject(err);
