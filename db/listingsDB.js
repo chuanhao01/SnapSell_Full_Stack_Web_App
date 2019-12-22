@@ -43,7 +43,42 @@ const listingsDB = {
             });
         });
     },
-
+    checkIfUserListing(listing_id, listing_user_id){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT * FROM LISTINGS
+            WHERE ((listing_id = ?) AND (listing_user_id = ?)) 
+            `, [listing_id, listing_user_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else if(data.length === 0){
+                    const err = new Error('Listing does not belong to user');
+                    err.code = 'USER_UNAUTH_LISTING';
+                    reject(err);
+                }
+                else{
+                    // If the user does have access to the listing
+                    resolve(true);
+                }
+            });
+        });
+    },
+    deleteAListing(listing_id){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            DELETE FROM LISTINGS
+            WHERE listing_id = ?
+            `, [listing_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
+    }
 };
 
 module.exports = listingsDB;

@@ -73,7 +73,19 @@
                 )
             },
             deleteListing(listing_id){
-                console.log(listing_id);
+                axios
+                .delete(`/api/listing/${listing_id}`)
+                .then(
+                    function(res){
+                        console.log(res);
+                        this.getUserListing();
+                    }.bind(this)
+                )
+                .catch(
+                    function(err){
+                        console.log(err);
+                    }
+                )
             }
         },
         created(){
