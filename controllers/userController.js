@@ -35,6 +35,12 @@ const userController = {
                 'title': 'Looking at listing'
             });
         });
+        // Edit a specific listing
+        app.get('/user/listing/edit/:listing_id', function(req, res){
+            res.render(listing_parent_dir + 'editUserSingleListing', {
+                'title': 'Editing a listing'
+            });
+        });
     }
 };
 

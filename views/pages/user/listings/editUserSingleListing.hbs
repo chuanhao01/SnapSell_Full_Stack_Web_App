@@ -1,9 +1,32 @@
 <main class="container-fluid mt-3">
     <div class="row">
         <div class="col-12">
+            <template
+            v-if='listing'>
+                <b-card
+                :title='listing.title'
+                :bg-variant='listing.availability ? "primary" : "success"'>
+                    <b-card-text>
+                        <span class="d-block font-weight-bold">Description</span>
+                        <p>
+                            \{{listing.description}}
+                        </p>
+                    </b-card-text>
+                    <b-card-text>
+                        <article>
+                            <span class="font-weight-bold">Price: </span>
+                            <span>
+                                \{{listing.price}}
+                            </span>
+                        </article>
+                    </b-card-text>
+                </b-card>
+            </template>
+        </div>
+        <div class="col-12">
             <article class="d-block w-100">
                 <h2 class="d-block text-center">
-                    Adding a new listing
+                    Editing a listing
                 </h2>
             </article>
             <b-form 
@@ -52,7 +75,7 @@
                 <b-button type="reset" variant="danger">Reset</b-button>
             </b-form>
         </div>
-    </div>
+    </div>    
 </main>
 
 {{#section 'scripts'}}
@@ -60,14 +83,30 @@
     const app = new Vue({
         el: '#app',
         data: {
+            listing: null,
             form: {
                 title: '',
                 description: '',
                 price: null
             },
-            showForm: true,
+            showForm: true
         },
-        methods:{
+        methods: {
+            getListing(){
+                const listing_id = window.location.pathname.split("/").pop();
+                axios
+                .get(`/api/listing/${listing_id}`)
+                .then(
+                    function(res){
+                        this.listing = res.data.listing;
+                    }.bind(this)
+                )
+                .catch(
+                    function(err){
+                        console.log(err.response);
+                    }
+                )
+            },
             onReset(event){
                 event.preventDefault();
                 this.form.title= '';
@@ -81,8 +120,9 @@
             },
             onSubmit(event){
                 event.preventDefault();
+                const listing_id = window.location.pathname.split("/").pop();
                 axios
-                .post('/api/listing', this.form)
+                .put(`/api/listing/${listing_id}`, this.form)
                 .catch(
                     function(err){
                         console.log(err.response);
@@ -91,11 +131,14 @@
                 .then(
                     function(res){
                         console.log(res);
-                        window.location.pathname = '/user/listing';
+                        window.location.pathname = `/user/listing/${listing_id}`;
                     }
                 );
             }
         },
+        created(){
+            this.getListing();
+        }
     });
 </script>
 {{/section}}

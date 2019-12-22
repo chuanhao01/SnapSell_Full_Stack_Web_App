@@ -129,6 +129,61 @@ const listingAPIController = {
                 }
             );
         });
+        app.put('/api/listing/:listing_id', function(req, res){
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.listing.checkIfUserListing(req.params.listing_id, req.user.user_id)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            if(err.code === 'USER_UNAUTH_LISTING'){
+                                res.status(401).send({
+                                    'Error': 'You cannot edit this listing',
+                                    'error_code': 'USER_UNAUTH_LISTING'
+                                });
+                                throw err.code;
+                            }
+                            else{
+                                res.status(500).send({
+                                    'Error': 'MySQL Error',
+                                    'error_code': err.code
+                                });
+                                throw 'MySQL_ERR';
+                            }
+                        }
+                    )
+                );
+            })
+            .then(
+                function(){
+                    // If you can edit the listing
+                    return dataAccess.listing.editUserListing(req.params.listing_id, req.body.title, req.body.description, req.body.price)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL Error',
+                                'error_code': err.code
+                            });
+                            throw 'MySQL_ERR';
+                        }
+                    );
+                }
+            )
+            .then(
+                function(){
+                    // if update is successful
+                    res.status(200).send({
+                        'Result': 'Update successful'
+                    });
+                }
+            )
+            .catch(
+                function(err){
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
         // Deleting a listing
         // TODO: Fix for final version
         app.delete('/api/listing/:listing_id', function(req, res){

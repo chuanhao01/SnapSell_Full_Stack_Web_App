@@ -58,6 +58,22 @@ const listingsDB = {
             });
         });
     },
+    editUserListing(listing_id, title, description, price){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            UPDATE LISTINGS
+            SET title = ?, description = ?, price = ?
+            WHERE listing_id = ?
+            `, [title, description, price, listing_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
+    },
     checkIfUserListing(listing_id, listing_user_id){
         return new Promise((resolve, reject) => {
             this.pool.query(`
