@@ -41,6 +41,13 @@ const userController = {
                 'title': 'Editing a listing'
             });
         });
+        // Others
+        // Looking at other listing
+        app.get('/listing', function(req, res){
+            res.render(listing_parent_dir + 'viewOtherListings', {
+                'title': 'Looking at other listings'
+            });
+        });
     }
 };
 

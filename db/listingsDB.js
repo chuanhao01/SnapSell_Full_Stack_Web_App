@@ -74,6 +74,22 @@ const listingsDB = {
             });
         });
     },
+    getOtherListing(listing_user_id){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT u.username AS listing_user_username, l.listing_id, l.title, l.description, l.price FROM LISTINGS l
+            LEFT JOIN USERS u ON l.listing_user_id = u.user_id
+            WHERE ((NOT (l.listing_user_id = ?)) AND (l.deleted = 0))
+            `, [listing_user_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
+    },
     checkIfUserListing(listing_id, listing_user_id){
         return new Promise((resolve, reject) => {
             this.pool.query(`

@@ -217,6 +217,7 @@ const listingAPIController = {
                     return dataAccess.listing.deleteAListing(req.params.listing_id)
                     .catch(
                         function(err){
+                            console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL Error',
                                 'error_code': err.code
@@ -231,6 +232,38 @@ const listingAPIController = {
                     // If the listing was successfully deleted
                     res.status(200).send({
                         'Result': 'Product was successfully deleted'
+                    });
+                }
+            )
+            .catch(
+                function(err){
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
+        // Others
+        // Getting all other listing
+        app.get('/api/other/listing', function(req, res){
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.listing.getOtherListing(req.user.user_id)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL Error',
+                                'error_code': err.code
+                            });
+                            throw 'MySQL_ERR';
+                        }
+                    )
+                );
+            })
+            .then(
+                function(listings){
+                    // If getting the listings were successful
+                    res.status(200).send({
+                        'listings': listings 
                     });
                 }
             )
