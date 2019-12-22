@@ -93,6 +93,12 @@
                         'Content-Type': 'multipart/form-data'
                     }
                 })
+                .then(
+                    function(res){
+                        // If account creation is successful, redirect to login page
+                        window.location.pathname = '/login';
+                    }
+                )
                 .catch(
                     function(err){
                         if(err.response.status === 422){
@@ -103,12 +109,10 @@
                             // Uploaded file is too large
                             return;
                         }
-                    }
-                )
-                .then(
-                    function(res){
-                        // If account creation is successful, redirect to login page
-                        window.location.pathname = '/login';
+                        else if(err.response.status === 403){
+                            // Username is already taken
+                            return;
+                        }
                     }
                 );
             },

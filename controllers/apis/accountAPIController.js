@@ -94,7 +94,49 @@ const accountAPIController = {
                     // Below is the format for handling promises from dataAccess
                     new Promise((resolve) => {
                         resolve(
-                            dataAccess.user.createANewUser(req.file.filename, req.body.username, req.body.password)
+                            dataAccess.user.getUserByUsername(req.body.username)
+                            .catch(
+                                function(err){
+                                    console.log(err);
+                                    res.status(500).send({
+                                        'Error': 'MySQL_ERR',
+                                        'error_code': err.code
+                                    });
+                                }
+                            )
+                        );
+                    })
+                    .then(
+                        function(user){
+                            // Check if the username is taken
+                            return new Promise((resolve, reject) => {
+                                if(user.length === 0){
+                                    // No one else has the username
+                                    resolve(true);
+                                }
+                                else{
+                                    const err = new Error('Username already taken');
+                                    err.code = 'USERNAME_TAKEN';
+                                    reject(err);
+                                }
+                            })
+                            .catch(
+                                function(err){
+                                    // If the username is already taken
+                                    console.log(err);
+                                    res.status(403).send({
+                                        'Error': 'Username already taken',
+                                        'error_code': err.code
+                                    });
+                                    throw err.code;
+                                }
+                            );
+                        }
+                    )
+                    .then(
+                        // If the username is not taken
+                        function(){
+                            return dataAccess.user.createANewUser(req.file.filename, req.body.username, req.body.password)
                             .catch(
                                 function(err){
                                     // If there are any erros deal with it here and raise it to the final catch
@@ -105,9 +147,9 @@ const accountAPIController = {
                                     });
                                     throw 'CREATE_USER_ERR';
                                 }
-                            )
-                        );
-                    })
+                            );
+                        }
+                    )
                     .then(
                         function(){
                             // If creating a user is successful
@@ -132,23 +174,43 @@ const accountAPIController = {
                         function(err){
                             // Gettting user by username errors
                             console.log(err);
-                            if(err.code === 'USER_NOT_EXIST'){
-                                res.status(500).send({
-                                    'Error': 'User does not exist',
-                                    'error_code': err.code
-                                });
-                            }
-                            else if(err.code === 'MANY_USERS'){
-                                res.status(500).send({
-                                    'Error': 'Duplicate users with the username',
-                                    'error_code': err.code
-                                });
-                            }
+                            res.status(500).send({
+                                'Error': 'MySQL_ERR',
+                                'error_code': err.code
+                            });
                             throw 'GET_USER_ERR';
                         }
                     )
                 );
             })
+            .then(
+                function(user){
+                    // Checking if the user exists
+                    return new Promise((resolve, reject) => {
+                        if(user.length === 0){
+                            // user does not exists
+                            const err = new Error('User does not exists');
+                            err.code = 'USER_DOES_NOT_EXISTS';
+                            reject(err);
+                        }
+                        else{
+                            // If the user exists, continue
+                            resolve(user[0]);
+                        }
+                    })
+                    .catch(
+                        function(err){
+                            // As the user does not exists
+                            console.log(err);
+                            res.status(401).send({
+                                'Error': 'User does not exists',
+                                'error_code': err.code
+                            });
+                            throw err.code;
+                        }
+                    );
+                }
+            )
             .then(
                 function(user){
                     // Checking if the credentials are correct

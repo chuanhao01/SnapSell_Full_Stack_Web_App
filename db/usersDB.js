@@ -81,6 +81,31 @@ const usersDB = {
         );
     },
     // Get the user by the username from the db, returns the whole user
+    // getUserByUsername(username){
+    //     return new Promise((resolve, reject) => {
+    //         this.pool.query(`
+    //         SELECT * FROM USERS
+    //         WHERE ((username = ?) AND (deleted = 0))
+    //         `, [username], function(err, data){
+    //             if(err){
+    //                 // If there is SQL errors
+    //                 return reject(err);
+    //             }
+    //             else if(data.length === 0){
+    //                 const err = new Error('User does not exist');
+    //                 err.code = 'USER_NOT_EXIST';
+    //                 return reject(err);
+    //             }
+    //             else if(data.length > 1){
+    //                 const err = new Error('Too many users');
+    //                 err.code = 'MANY_USERS';
+    //                 return reject(err);
+    //             }
+    //             return resolve(data[0]);
+    //         });
+    //     });
+    // },
+    // Get the user by the username from the db
     getUserByUsername(username){
         return new Promise((resolve, reject) => {
             this.pool.query(`
@@ -89,19 +114,11 @@ const usersDB = {
             `, [username], function(err, data){
                 if(err){
                     // If there is SQL errors
-                    return reject(err);
+                    reject(err);
                 }
-                else if(data.length === 0){
-                    const err = new Error('User does not exist');
-                    err.code = 'USER_NOT_EXIST';
-                    return reject(err);
+                else{
+                    resolve(data);
                 }
-                else if(data.length > 1){
-                    const err = new Error('Too many users');
-                    err.code = 'MANY_USERS';
-                    return reject(err);
-                }
-                return resolve(data[0]);
             });
         });
     },
