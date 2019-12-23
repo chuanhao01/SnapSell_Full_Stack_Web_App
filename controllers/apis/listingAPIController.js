@@ -135,25 +135,45 @@ const listingAPIController = {
                     dataAccess.listing.checkIfUserListing(req.params.listing_id, req.user.user_id)
                     .catch(
                         function(err){
+                            // If there are any MySQL errors
                             console.log(err);
-                            if(err.code === 'USER_UNAUTH_LISTING'){
-                                res.status(401).send({
-                                    'Error': 'You cannot edit this listing',
-                                    'error_code': 'USER_UNAUTH_LISTING'
-                                });
-                                throw err.code;
-                            }
-                            else{
-                                res.status(500).send({
-                                    'Error': 'MySQL Error',
-                                    'error_code': err.code
-                                });
-                                throw 'MySQL_ERR';
-                            }
+                            res.status(500).send({
+                                'Error': 'MySQL Error',
+                                'error_code': err.code
+                            });
+                            throw 'MySQL_ERR';
                         }
                     )
                 );
             })
+            .then(
+                function(user_listing_own){
+                    // Here we check if the user sending the request own the listing
+                    return new Promise((resolve, reject) =>{
+                        if(user_listing_own){
+                            // If he does own his own listing
+                            // Then continue
+                            resolve(true);
+                        }
+                        else{
+                            // If they dont own the listing
+                            const err = new Error('Listing does not belong to user');
+                            err.code = 'USER_UNAUTH_LISTING';
+                            reject(err);
+                        }
+                    })
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(401).send({
+                                'Error': 'You cannot edit this listing',
+                                'error_code': 'USER_UNAUTH_LISTING'
+                            });
+                            throw err.code;
+                        }
+                    );
+                }
+            )
             .then(
                 function(){
                     // If you can edit the listing
@@ -193,24 +213,40 @@ const listingAPIController = {
                     .catch(
                         function(err){
                             console.log(err);
-                            if(err.code === 'USER_UNAUTH_LISTING'){
-                                res.status(401).send({
-                                    'Error': 'You cannot edit this listing',
-                                    'error_code': 'USER_UNAUTH_LISTING'
-                                });
-                                throw err.code;
-                            }
-                            else{
-                                res.status(500).send({
-                                    'Error': 'MySQL Error',
-                                    'error_code': err.code
-                                });
-                                throw 'MySQL_ERR';
-                            }
+                            res.status(500).send({
+                                'Error': 'MySQL Error',
+                                'error_code': err.code
+                            });
+                            throw 'MySQL_ERR';
                         }
                     )
                 );
             })
+            .then(
+                function(user_listing_own){
+                    return new Promise((resolve, reject) =>{
+                        if(user_listing_own){
+                            // If the user does own the listing
+                            resolve(true);
+                        }
+                        else{
+                            const err = new Error('Listing does not belong to user');
+                            err.code = 'USER_UNAUTH_LISTING';
+                            reject(err);
+                        }
+                    })
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(401).send({
+                                'Error': 'You cannot edit this listing',
+                                'error_code': 'USER_UNAUTH_LISTING'
+                            });
+                            throw err.code;
+                        }
+                    );
+                }
+            )
             .then(
                 function(){
                     // If the user does have access to the listing

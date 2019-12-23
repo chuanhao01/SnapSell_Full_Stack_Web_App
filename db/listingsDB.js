@@ -101,12 +101,11 @@ const listingsDB = {
                     reject(err);
                 }
                 else if(data.length === 0){
-                    const err = new Error('Listing does not belong to user');
-                    err.code = 'USER_UNAUTH_LISTING';
-                    reject(err);
+                    // If the user does not own the listing
+                    resolve(false);
                 }
                 else{
-                    // If the user does have access to the listing
+                    // If the user does own the listing
                     resolve(true);
                 }
             });
