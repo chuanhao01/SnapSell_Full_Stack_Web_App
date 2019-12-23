@@ -48,6 +48,18 @@ const userController = {
                 'title': 'Looking at other listings'
             });
         });
+        // Looking at an individual listing
+        app.get('/listing/:listing_id', function(req, res){
+            res.render(listing_parent_dir + 'viewOtherSingleListing', {
+                'title': 'Viewing a listing'
+            });
+        });
+        // Add an offering
+        app.get('/listing/offer/:listing_id', function(req, res){
+            res.render(listing_parent_dir + 'addOffering', {
+                'title': 'Adding an offering'
+            });
+        });
     }
 };
 

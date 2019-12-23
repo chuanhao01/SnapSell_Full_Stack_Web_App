@@ -31,8 +31,9 @@ const listingsDB = {
     getListingById(listing_id){
         return new Promise((resolve, reject) => {
             this.pool.query(`
-            SELECT * FROM LISTINGS
-            WHERE ((listing_id = ?) AND (deleted = 0)) 
+            SELECT u.username AS listing_user_username, l.listing_id, l.title, l.description, l.price, l.listing_user_id, l.created_timestamp, l.availability, l.last_modified_timestamp FROM LISTINGS l
+            LEFT JOIN USERS u ON l.listing_user_id = u.user_id
+            WHERE ((l.listing_id = ?) AND (l.deleted = 0))
             `, [listing_id], function(err, data){
                 if(err){
                     reject(err);
@@ -77,7 +78,7 @@ const listingsDB = {
     getOtherListing(listing_user_id){
         return new Promise((resolve, reject) => {
             this.pool.query(`
-            SELECT u.username AS listing_user_username, l.listing_id, l.title, l.description, l.price FROM LISTINGS l
+            SELECT u.username AS listing_user_username, l.listing_id, l.title, l.description, l.price, l.listing_user_id, l.created_timestamp, l.availability, l.last_modified_timestamp FROM LISTINGS l
             LEFT JOIN USERS u ON l.listing_user_id = u.user_id
             WHERE ((NOT (l.listing_user_id = ?)) AND (l.deleted = 0))
             `, [listing_user_id], function(err, data){
