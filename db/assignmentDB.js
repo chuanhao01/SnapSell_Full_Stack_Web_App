@@ -302,6 +302,22 @@ const assignmentDB = {
                 }
             });
         });
+    },
+    // Q11 GET /listings/:id/offers
+    getListingsIdOffers(listing_id){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT * FROM OFFERS
+            WHERE listing_id = ?
+            `, [listing_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
     }
 };
 

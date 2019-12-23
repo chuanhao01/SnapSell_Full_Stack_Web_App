@@ -377,6 +377,37 @@ const assignmentAPIController= {
                 }
             );
         });
+        // Q11 GET /listings/:id/offers
+        app.get('/listings/:id/offers', function(req, res){
+            const listing_id = req.params.id;
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.assignment.getListingsIdOffers(listing_id)
+                    .catch(
+                        function(err){
+                           console.log(err);
+                            res.status(500).send({
+                                'Condition': 'Unknown error',
+                                'Code': '500 Internal Server Error'
+                            });
+                            throw 'GETLISTINGSIDOFFERS_DB_ERR';
+                        }
+                    )
+                );
+            })
+            .then(
+                function(offers){
+                    // If there are no errors getting the offers
+                    res.status(200).send(offers);
+                }
+            )
+            .catch(
+                function(err){
+                    // Final catch for all errors
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
     }
 };
 
