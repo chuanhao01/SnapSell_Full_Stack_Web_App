@@ -152,6 +152,37 @@ const offerAPIController = {
                 }
             );
         });
+        app.get('/api/offer/check/:listing_id', function(req, res){
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.offer.checkUserPlacedOffer(req.params.listing_id, req.user.user_id)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL_ERR',
+                                'error_code': err.code
+                            });
+                            throw 'MySQL_ERR';
+                        }
+                    )
+                );
+            })
+            .then(
+                // Send the result if the offer has been placed by the user
+                function(user_offer_placed){
+                    res.status(200).send({
+                        'offer_placed': user_offer_placed
+                    });
+                }
+            )
+            .catch(
+                function(err){
+                    // Final catch for all errors
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
     }
 };
 

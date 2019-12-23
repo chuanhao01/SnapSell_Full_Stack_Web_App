@@ -27,7 +27,14 @@
                         </article>
                     </b-card-text>
                     <b-card-text>
-                        <b-button variant="warning" :href='`/listing/offer/${listing.listing_id}`'>Place an offering</b-button>
+                        <template
+                        v-if='offer_placed'>
+                            <b-button variant="danger" :href='`/listing/offer/${listing.listing_id}`'>Edit your offering</b-button>
+                        </template>
+                        <template
+                        v-else>
+                            <b-button variant="warning" :href='`/listing/offer/${listing.listing_id}`'>Place an offering</b-button>
+                        </template>
                     </b-card-text>
                 </b-card>
             </template>
@@ -72,7 +79,7 @@
         data: {
             listing: null,
             offers: null,
-            addOffer: true,
+            offer_placed: null,
         },
         methods: {
             getListing(){
@@ -95,7 +102,6 @@
                 return axios.get(`/api/offer/${listing_id}`)
                 .then(
                     function(res){
-                        console.log(res);
                         this.offers = res.data.offers
                     }.bind(this)
                 )
@@ -106,60 +112,27 @@
                     }
                 )
             },
-            searchForUserOffer(user_id){
-                let user_offer = this.offers.find(function(offer){
-                    return offer.offer_user_id === user_id
-                });
-                if(user_offer){
-                    // If the user has made an offer before
-                }
-            },
-            getUserId(){
-                return axios.get('/api/user/id')
+            checkOfferMade(){
+                const listing_id = window.location.pathname.split("/").pop();
+                return axios
+                .get(`/api/offer/check/${listing_id}`)
                 .then(
                     function(res){
-                        return new Promise((resolve) => {
-                            resolve(res.data.user_id);
-                        });
-                    }
+                        console.log(res)
+                        this.offer_placed = res.data.offer_placed;
+                    }.bind(this)
                 )
                 .catch(
                     function(err){
                         console.log(err.response);
-                        throw 'GET_ERR';
                     }
-                );
+                )
             }
         },
         created(){
             this.getListing();
-            {{!-- new Promise((resolve) => {
-                let offer_promise = this.getOffers();
-                resolve(
-                    offer_promise
-                );
-            }); --}}
-            new Promise((resolve) => {
-                let offer_promise = this.getOffers();
-                resolve(
-                    offer_promise
-                );
-            })
-            .then(
-                function(){
-                    return this.getUserId();
-                }.bind(this)
-            )
-            .then(
-                function(user_id){
-                    this.searchForUserOffer(user_id);
-                }.bind(this)
-            )
-            .catch(
-                function(err){
-                    console.log(err);
-                }
-            );
+            this.getOffers();
+            this.checkOfferMade();
         }
     });
 </script>
