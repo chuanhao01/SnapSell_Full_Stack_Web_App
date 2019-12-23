@@ -3,7 +3,7 @@
         <div class="col-12">
             <article class="d-block w-100">
                 <h2 class="d-block text-center">
-                    Adding an offering
+                    Adding an offer 
                 </h2>
             </article>
             <b-form 
@@ -59,9 +59,6 @@
                             </span>
                         </article>
                     </b-card-text>
-                    <b-card-text>
-                        <b-button variant="warning" :href='`/listing/offer/${listing.listing_id}`'>Place an offering</b-button>
-                    </b-card-text>
                 </b-card>
             </template>
         </div>
@@ -82,7 +79,7 @@
         methods:{
             onReset(event){
                 event.preventDefault();
-                this.offer_price = null;
+                this.form.offer_price = null;
                 //This is to reload the form to make it empty
                 this.showForm = false;
                 Vue.nextTick(() => {
@@ -91,17 +88,17 @@
             },
             onSubmit(event){
                 event.preventDefault();
+                const listing_id = window.location.pathname.split("/").pop();
                 axios
-                .post('/api/offer/', this.form)
-                .catch(
-                    function(err){
-                        console.log(err.response);
-                    }
-                )
+                .post(`/api/offer/${listing_id}`, this.form)
                 .then(
                     function(res){
                         console.log(res);
-                        window.location.pathname = '/user/listing';
+                    }
+                )
+                .catch(
+                    function(err){
+                        console.log(err.response);
                     }
                 );
             },

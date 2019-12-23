@@ -31,6 +31,36 @@
                     </b-card-text>
                 </b-card>
             </template>
+
+        </div>
+        <div class="col-12 mt-3">
+            <article class="d-block">
+                <h3 class="d-block text-center">
+                    Offers for this listing
+                </h3>
+            </article>
+            <template
+            v-if='offers'>
+                <b-card
+                v-for='offer in offers'
+                :bg-variant='offer.status ? "warning" : "primary"'
+                >
+                    <b-card-text>
+                        <article class="d-block">
+                            <span class="font-weight-bold">Offer price: </span>
+                            <span>
+                                \{{offer.offer_price}}
+                            </span>
+                        </article>
+                        <article class="d-block">
+                            <span class="font-weight-bold">By: </span>
+                            <span>
+                                \{{offer.offer_user_username}}
+                            </span>
+                        </article>
+                    </b-card-text>
+                </b-card>
+            </template>
         </div>
     </div>    
 </main>
@@ -41,12 +71,13 @@
         el: '#app',
         data: {
             listing: null,
+            offers: null,
+            addOffer: true,
         },
         methods: {
             getListing(){
                 const listing_id = window.location.pathname.split("/").pop();
-                axios
-                .get(`/api/listing/${listing_id}`)
+                return axios.get(`/api/listing/${listing_id}`)
                 .then(
                     function(res){
                         this.listing = res.data.listing;
@@ -55,12 +86,80 @@
                 .catch(
                     function(err){
                         console.log(err.response);
+                        throw 'GET_ERR';
                     }
                 )
+            },
+            getOffers(){
+                const listing_id = window.location.pathname.split("/").pop();
+                return axios.get(`/api/offer/${listing_id}`)
+                .then(
+                    function(res){
+                        console.log(res);
+                        this.offers = res.data.offers
+                    }.bind(this)
+                )
+                .catch(
+                    function(err){
+                        console.log(err);
+                        throw 'GET_ERR';
+                    }
+                )
+            },
+            searchForUserOffer(user_id){
+                let user_offer = this.offers.find(function(offer){
+                    return offer.offer_user_id === user_id
+                });
+                if(user_offer){
+                    // If the user has made an offer before
+                }
+            },
+            getUserId(){
+                return axios.get('/api/user/id')
+                .then(
+                    function(res){
+                        return new Promise((resolve) => {
+                            resolve(res.data.user_id);
+                        });
+                    }
+                )
+                .catch(
+                    function(err){
+                        console.log(err.response);
+                        throw 'GET_ERR';
+                    }
+                );
             }
         },
         created(){
             this.getListing();
+            {{!-- new Promise((resolve) => {
+                let offer_promise = this.getOffers();
+                resolve(
+                    offer_promise
+                );
+            }); --}}
+            new Promise((resolve) => {
+                let offer_promise = this.getOffers();
+                resolve(
+                    offer_promise
+                );
+            })
+            .then(
+                function(){
+                    return this.getUserId();
+                }.bind(this)
+            )
+            .then(
+                function(user_id){
+                    this.searchForUserOffer(user_id);
+                }.bind(this)
+            )
+            .catch(
+                function(err){
+                    console.log(err);
+                }
+            );
         }
     });
 </script>

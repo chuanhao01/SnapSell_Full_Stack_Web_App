@@ -16,16 +16,19 @@ const pool = mysql.createPool({
 const usersDB = require('./usersDB');
 const assignmentDB = require('./assignmentDB');
 const listingsDB = require('./listingsDB');
+const offersDB = require('./offersDB');
 
 usersDB.init(pool);
 assignmentDB.init(pool);
 listingsDB.init(pool);
+offersDB.init(pool);
 
 // Setting up the main object to export to access the db
 const dataAccess = {
     user: usersDB,
     assignment: assignmentDB,
-    listing: listingsDB
+    listing: listingsDB,
+    offer: offersDB 
 };
 
 module.exports = dataAccess;

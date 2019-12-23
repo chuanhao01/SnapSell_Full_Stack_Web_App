@@ -1,7 +1,6 @@
 // This file contains controllers pertaining to:
 // Anything that has to do with listings such as the CRUD of listings
 
-
 // Importing dataAccess object to interface with the DB
 const dataAccess = require('../../db/index');
 
