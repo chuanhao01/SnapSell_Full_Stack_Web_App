@@ -62,6 +62,17 @@
                 </b-card>
             </template>
         </div>
+        <div class="col-12">
+            <template v-if='offer'>
+                <b-card
+                :title='`Your current offer is: \$${offer.offer_price}`'
+                bg-variant='primary' 
+                class="mt-3"
+                >
+
+                </b-card>
+            </template>
+        </div>
     </div>
 </main>
 
@@ -75,6 +86,7 @@
             },
             showForm: true,
             listing: null,
+            offer: null,
         },
         methods:{
             onReset(event){
@@ -90,7 +102,7 @@
                 event.preventDefault();
                 const listing_id = window.location.pathname.split("/").pop();
                 axios
-                .post(`/api/offer/${listing_id}`, this.form)
+                .put(`/api/offer/${listing_id}`, this.form)
                 .then(
                     function(res){
                         console.log(res);
@@ -116,10 +128,26 @@
                         console.log(err.response);
                     }
                 )
+            },
+            getUserOffer(){
+                const listing_id = window.location.pathname.split("/").pop();
+                axios
+                .get(`/api/offer/user/${listing_id}`)
+                .then(
+                    function(res){
+                        this.offer = res.data.offer;
+                    }.bind(this)
+                )
+                .catch(
+                    function(err){
+                        console.log(err.response);
+                    }
+                )
             }
         },
         created(){
             this.getListing();
+            this.getUserOffer();
         }
     });
 </script>

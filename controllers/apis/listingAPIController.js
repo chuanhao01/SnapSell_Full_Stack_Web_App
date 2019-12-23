@@ -97,7 +97,6 @@ const listingAPIController = {
                             const err = new Error('Listing not found');
                             err.code = 'LISTING_NOT_FOUND';
                             reject(err);
-                            
                         }
                         else{
                             resolve(listing[0]);

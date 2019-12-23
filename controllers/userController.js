@@ -57,7 +57,13 @@ const userController = {
         // Add an offering
         app.get('/listing/offer/:listing_id', function(req, res){
             res.render(listing_parent_dir + 'addOffering', {
-                'title': 'Adding an offering'
+                'title': 'Adding an offer'
+            });
+        });
+        // Edit an offering
+        app.get('/listing/offer/edit/:listing_id', function(req, res){
+            res.render(listing_parent_dir + 'editOffering', {
+                'title': 'Editing an offer'
             });
         });
     }

@@ -183,6 +183,63 @@ const offerAPIController = {
                 }
             );
         });
+        app.get('/api/offer/user/:listing_id', function(req, res){
+            // Gets the offer the user has on the listing
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.offer.getUserOffer(req.params.listing_id, req.user.user_id)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL_ERR',
+                                'error_code': err.code
+                            });
+                            throw 'MySQL_ERR';
+                        }
+                    )
+                );
+            })
+            .then(
+                // Send the result if the offer has been placed by the user
+                function(offer){
+                    return new Promise((resolve, reject) =>{
+                        if(offer.length === 0){
+                            const err = new Error('Offer not found');
+                            err.code = 'OFFER_NOT_FOUND';
+                            reject(err);
+                        }
+                        else{
+                            // If getting the offer was successful
+                            resolve(offer[0]);
+                        }
+                    })
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(404).send({
+                                'Error': 'Offer not found',
+                                'error_code': err.code
+                            });
+                            throw err.code;
+                        }
+                    );
+                }
+            )
+            .then(
+                function(offer){
+                    res.status(200).send({
+                        'offer': offer
+                    });
+                }
+            )
+            .catch(
+                function(err){
+                    // Final catch for all errors
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
     }
 };
 

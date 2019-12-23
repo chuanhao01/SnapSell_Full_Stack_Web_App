@@ -45,19 +45,34 @@ const offersDB = {
     checkUserPlacedOffer(listing_id, offer_user_id){
         return new Promise((resolve, reject) =>{
             this.pool.query(`
-           SELECT * FROM OFFERS
-           WHERE ((listing_id = ?) AND (offer_user_id = ?)) 
+            SELECT * from OFFERS 
+            WHERE ((listing_id = ?) AND (offer_user_id = ?)) 
             `, [listing_id, offer_user_id], function(err, data){
                 if(err){
                     reject(err);
                 }
                 else if(data.length === 0){
-                    // If he has never placed the offer before
+                    // if he has never placed the offer before
                     resolve(false);
                 }
                 else{
-                    // He has placed an offer before
+                    // he has placed an offer before
                     resolve(true);
+                }
+            });
+        });
+    },
+    getUserOffer(listing_id, offer_user_id){
+        return new Promise((resolve, reject) =>{
+            this.pool.query(`
+            SELECT * from OFFERS
+            WHERE ((listing_id = ?) AND (offer_user_id = ?)) 
+            `, [listing_id, offer_user_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
                 }
             });
         });
