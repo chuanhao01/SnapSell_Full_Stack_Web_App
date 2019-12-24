@@ -408,6 +408,39 @@ const assignmentAPIController= {
                 }
             );
         });
+        // Q12 POST /listing/:id/offers
+        app.post('/listings/:id/offers', function(req, res){
+            const listing_id = req.params.id;
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.assignment.postListingsIdOffers(listing_id, req.body.offer_user_id, req.body.offer_price)
+                    .catch(
+                        function(err){
+                           console.log(err);
+                            res.status(500).send({
+                                'Condition': 'Unknown error',
+                                'Code': '500 Internal Server Error'
+                            });
+                            throw 'POSTLISTINGSIDOFFERS_DB_ERR';
+                        }
+                    )
+                );
+            })
+            .then(
+                function(offer_id){
+                    // If there are no errors in making an offer
+                    res.status(201).send({
+                        'offer_id': offer_id
+                    });
+                }
+            )
+            .catch(
+                function(err){
+                    // Final catch for all errors
+                    console.log('Final catch err: ' + err);
+                }
+            );                    
+        });
     }
 };
 

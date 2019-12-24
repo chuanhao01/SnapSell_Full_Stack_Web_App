@@ -318,6 +318,25 @@ const assignmentDB = {
                 }
             });
         });
+    },
+    // Q12 POST /listing/:id/offers
+    postListingsIdOffers(listing_id, offer_user_id, offer_price){
+        return new Promise((resolve, reject) =>{
+            const offer_id = uuid();
+            this.pool.query(`
+            INSERT INTO OFFERS
+            (offer_id, listing_id, offer_user_id, offer_price, status, deleted)
+            VALUES
+            (?, ?, ?, ?, ?, ?)
+            `, [offer_id, listing_id, offer_user_id, offer_price, 0, 0], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(offer_id);
+                }
+            });
+        });       
     }
 };
 
