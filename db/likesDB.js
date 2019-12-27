@@ -32,12 +32,14 @@ const likesDB = {
     // Function called to like a listing
     likeAListing(listing_id, user_id){
         return new Promise((resolve, reject) => {
+            // Creating like_id
+            const like_id = uuid();
             this.pool.query(`
             INSERT INTO LIKES
-            (listing_id, user_id, deleted)
+            (like_id, listing_id, user_id, deleted)
             VALUES
-            (?, ?, 0) 
-            `, [listing_id, user_id], function(err, data){
+            (?, ?, ?, 0) 
+            `, [like_id, listing_id, user_id], function(err, data){
                 if(err){
                     reject(err);
                 }
@@ -53,7 +55,7 @@ const likesDB = {
             this.pool.query(`
             UPDATE LIKES
             SET deleted = 1
-            WHERE ((listing_id = ?) AND (user_id = ?))
+            WHERE ((listing_id = ?) AND (user_id = ?) AND (deleted = 0))
             `, [listing_id, user_id], function(err, data){
                 if(err){
                     reject(err);
