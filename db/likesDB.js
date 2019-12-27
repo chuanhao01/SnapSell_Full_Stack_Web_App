@@ -63,7 +63,7 @@ const likesDB = {
                 }
             });
         });
-    }
+    },
 };
 
 module.exports = likesDB;

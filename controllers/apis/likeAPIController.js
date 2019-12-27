@@ -81,7 +81,37 @@ const likeAPIController = {
                 }
             );
         });
-        
+        // Endpoint to check if the listing has been liked the user, returns the boolean
+        app.get('/api/like/check/:listing_id', function(req, res){
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.like.checkLike(req.params.listing_id, req.user.user_id)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL error',
+                                'error_code': err.code
+                            });
+                            throw 'MySQL_ERR';
+                        }
+                    )
+                );
+            })
+            .then(
+                function(user_like_before){
+                    res.status(200).send({
+                        like_before: user_like_before
+                    });
+                }
+            )
+            .catch(
+                function(err){
+                    // Final catch for all errors
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
     }
 };
 

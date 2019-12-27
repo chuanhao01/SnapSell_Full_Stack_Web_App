@@ -29,7 +29,12 @@
                             <span>
                                 Likes: placeholder
                             </span>
-                            <template>
+                            <template
+                            v-if='like_before'>
+                                <b-button variant='danger' @click=unlikeListing>Unlike the listing</b-button>
+                            </template>
+                            <template
+                            v-else>
                                 <b-button variant='primary' @click=likeListing>Like the listing</b-button>
                             </template>
                         </article>
@@ -89,6 +94,7 @@
             listing: null,
             offers: null,
             offer_placed: null,
+            like_before: null,
         },
         methods: {
             getListing(){
@@ -138,6 +144,22 @@
                     }
                 )
             },
+            checkLike(){
+                const listing_id = window.location.pathname.split("/").pop();
+                axios
+                .get(`/api/like/check/${listing_id}`)
+                .then(
+                    function(res){
+                        console.log(res)
+                        this.like_before = res.data.like_before;
+                    }.bind(this)
+                )
+                .catch(
+                    function(err){
+                        console.log(err.response);
+                    }
+                )
+            },
             deleteOffer(){
                 const listing_id = window.location.pathname.split("/").pop();
                 axios
@@ -161,6 +183,22 @@
                 .then(
                     function(res){
                         console.log(res);
+                        document.location.reload(true);
+                    }
+                )
+                .catch(
+                    function(err){
+                        console.log(err);
+                    }
+                )
+            },
+            unlikeListing(){
+                const listing_id = window.location.pathname.split("/").pop();
+                axios
+                .delete(`/api/like/${listing_id}`)
+                .then(
+                    function(res){
+                        console.log(res);
                     }
                 )
                 .catch(
@@ -174,6 +212,7 @@
             this.getListing();
             this.getOffers();
             this.checkOfferMade();
+            this.checkLike();
         }
     });
 </script>
