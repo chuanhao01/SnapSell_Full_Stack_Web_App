@@ -29,12 +29,13 @@
                     <b-card-text>
                         <template
                         v-if='offer_placed'>
-                            <b-button variant="danger" :href='`/listing/offer/edit/${listing.listing_id}`'>Edit your offering</b-button>
+                            <b-button variant="warning" :href='`/listing/offer/edit/${listing.listing_id}`'>Edit your offering</b-button>
                         </template>
                         <template
                         v-else>
-                            <b-button variant="warning" :href='`/listing/offer/${listing.listing_id}`'>Place an offering</b-button>
+                            <b-button variant="primary" :href='`/listing/offer/${listing.listing_id}`'>Place an offering</b-button>
                         </template>
+                        <b-button variant='danger' @click='deleteOffer'>Delete your offer</b-button>
                     </b-card-text>
                 </b-card>
             </template>
@@ -99,7 +100,8 @@
             },
             getOffers(){
                 const listing_id = window.location.pathname.split("/").pop();
-                return axios.get(`/api/offer/${listing_id}`)
+                axios
+                .get(`/api/offer/${listing_id}`)
                 .then(
                     function(res){
                         this.offers = res.data.offers
@@ -114,13 +116,29 @@
             },
             checkOfferMade(){
                 const listing_id = window.location.pathname.split("/").pop();
-                return axios
+                axios
                 .get(`/api/offer/check/${listing_id}`)
                 .then(
                     function(res){
                         console.log(res)
                         this.offer_placed = res.data.offer_placed;
                     }.bind(this)
+                )
+                .catch(
+                    function(err){
+                        console.log(err.response);
+                    }
+                )
+            },
+            deleteOffer(){
+                const listing_id = window.location.pathname.split("/").pop();
+                axios
+                .delete(`/api/offer/${listing_id}`)
+                .then(
+                    function(res){
+                        console.log(res.data);
+                        document.location.reload(true);
+                    }
                 )
                 .catch(
                     function(err){

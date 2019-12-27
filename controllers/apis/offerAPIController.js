@@ -121,6 +121,39 @@ const offerAPIController = {
                 }
             );
         });
+        // Delete a user's offer on a listing
+        app.delete('/api/offer/:listing_id', function(req, res){
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.offer.deleteUserOffer(req.params.listing_id, req.user.user_id)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL_ERR',
+                                'error_code': err.code
+                            });
+                            throw 'MySQL_ERR';
+                        }
+                    )
+                );
+            })
+            .then(
+                function(){
+                    // if the offer was successfully deleted
+                    res.status(200).send({
+                        'Result': 'Offer was successfully deleted'
+                    });
+                }
+            )
+            .catch(
+                function(err){
+
+                    // Final catch for all errors
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
         // Get the offers for a listing
         app.get('/api/offer/:listing_id', function(req, res){
             new Promise((resolve) => {
