@@ -6,7 +6,7 @@ const dataAccess = require('../../db/index');
 
 const offerAPIController = {
     init(app){
-        // Adding a listing
+        // Adding an offer for a listing 
         app.post('/api/offer/:listing_id', function(req, res){
             new Promise((resolve) => {
                 resolve(
@@ -121,6 +121,7 @@ const offerAPIController = {
                 }
             );
         });
+        // Get the offers for a listing
         app.get('/api/offer/:listing_id', function(req, res){
             new Promise((resolve) => {
                 resolve(
@@ -152,6 +153,7 @@ const offerAPIController = {
                 }
             );
         });
+        // Checks if the user has placed an offer on the listing, returns the boolean value 
         app.get('/api/offer/check/:listing_id', function(req, res){
             new Promise((resolve) => {
                 resolve(
@@ -183,8 +185,8 @@ const offerAPIController = {
                 }
             );
         });
+        // Gets the offer the user has on the listing
         app.get('/api/offer/user/:listing_id', function(req, res){
-            // Gets the offer the user has on the listing
             new Promise((resolve) => {
                 resolve(
                     dataAccess.offer.getUserOffer(req.params.listing_id, req.user.user_id)
