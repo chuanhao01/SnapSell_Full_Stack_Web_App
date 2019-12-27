@@ -17,18 +17,21 @@ const usersDB = require('./usersDB');
 const assignmentDB = require('./assignmentDB');
 const listingsDB = require('./listingsDB');
 const offersDB = require('./offersDB');
+const likesDB = require('./likesDB');
 
 usersDB.init(pool);
 assignmentDB.init(pool);
 listingsDB.init(pool);
 offersDB.init(pool);
+likesDB.init(pool);
 
 // Setting up the main object to export to access the db
 const dataAccess = {
     user: usersDB,
     assignment: assignmentDB,
     listing: listingsDB,
-    offer: offersDB 
+    offer: offersDB,
+    like: likesDB
 };
 
 module.exports = dataAccess;

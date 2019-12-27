@@ -25,17 +25,25 @@
                                 \{{listing.listing_user_username}}
                             </span>
                         </article>
+                        <article>
+                            <span>
+                                Likes: placeholder
+                            </span>
+                            <template>
+                                <b-button variant='primary' @click=likeListing>Like the listing</b-button>
+                            </template>
+                        </article>
                     </b-card-text>
                     <b-card-text>
                         <template
                         v-if='offer_placed'>
                             <b-button variant="warning" :href='`/listing/offer/edit/${listing.listing_id}`'>Edit your offering</b-button>
+                            <b-button variant='danger' @click='deleteOffer'>Delete your offer</b-button>
                         </template>
                         <template
                         v-else>
                             <b-button variant="primary" :href='`/listing/offer/${listing.listing_id}`'>Place an offering</b-button>
                         </template>
-                        <b-button variant='danger' @click='deleteOffer'>Delete your offer</b-button>
                     </b-card-text>
                 </b-card>
             </template>
@@ -143,6 +151,21 @@
                 .catch(
                     function(err){
                         console.log(err.response);
+                    }
+                )
+            },
+            likeListing(){
+                const listing_id = window.location.pathname.split("/").pop();
+                axios
+                .post(`/api/like/${listing_id}`)
+                .then(
+                    function(res){
+                        console.log(res);
+                    }
+                )
+                .catch(
+                    function(err){
+                        console.log(err);
                     }
                 )
             }
