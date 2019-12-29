@@ -97,6 +97,7 @@ const usersDB = {
             });
         });
     },
+    // Get the user by its ID
     getUserByUserId(user_id){
         return new Promise((resolve, reject) => {
             this.pool.query(`

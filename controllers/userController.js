@@ -9,11 +9,18 @@ Here req.user has all the information of the user
 const userController = {
     init(app){
         const parent_dir = 'pages/user/';
+        const profile_parent_dir = parent_dir + 'profile/';
         const listing_parent_dir = parent_dir + 'listings/';
         // users home page
         app.get('/user/home', function(req, res){
             res.render(parent_dir + 'userHome', {
                 'title': `Welcome ${req.user.username}`
+            });
+        });
+        // Looking at their own profile
+        app.get('/user/profile', function(req, res){
+            res.render(profile_parent_dir + 'viewProfile', {
+                'title': 'Looking at your own profile'
             });
         });
         // Listings

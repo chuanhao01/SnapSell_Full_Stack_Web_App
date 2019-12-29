@@ -6,10 +6,25 @@ const dataAccess = require('../../db/index');
 
 const userAPIController = {
     init(app){
-        app.get('/api/user/id', function(req, res){
-            // Returns the user_id of the user
+        const avatar_icon_file_base_path = '/uploads/avatarIcons/' ;
+        // Get the user basic info
+        app.get('/api/user', function(req, res){
             res.status(200).send({
-                'user_id': req.user.user_id
+                'user': {
+                    'username': req.user.username,
+                }
+            });
+        });
+        // Gets the user's avatar_icon
+        app.get('/api/user/avatar_icon', function(req, res){
+            res.sendFile(process.cwd() + avatar_icon_file_base_path + req.user.avatar_icon_file_name, function(err){
+                if(err){
+                    console.log(err);
+                    res.status(500).send({
+                        'Error': 'Error retriving avatar',
+                        'error_code': 'GET_AVATAR_ERROR' 
+                    });
+                }
             });
         });
     }
