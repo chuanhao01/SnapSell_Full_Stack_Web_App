@@ -18,7 +18,7 @@ const listingAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL error',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }
@@ -51,7 +51,7 @@ const listingAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL error',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MYSQL_ERR';
                         }
@@ -82,7 +82,7 @@ const listingAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL_ERR',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }
@@ -107,8 +107,9 @@ const listingAPIController = {
                             console.log(err);
                             res.status(404).send({
                                 'Error': 'Listing not found',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
+                            throw err.code;
                         }
                     );
                 }
@@ -137,7 +138,7 @@ const listingAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL Error',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }
@@ -181,7 +182,7 @@ const listingAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL Error',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }
@@ -213,7 +214,7 @@ const listingAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL Error',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }
@@ -254,7 +255,7 @@ const listingAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL Error',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }
@@ -286,7 +287,7 @@ const listingAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL Error',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }

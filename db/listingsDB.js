@@ -31,10 +31,20 @@ const listingsDB = {
     getListingById(listing_id){
         return new Promise((resolve, reject) => {
             this.pool.query(`
-            SELECT u.username AS listing_user_username, l.listing_id, l.title, l.description, l.price, l.listing_user_id, l.created_timestamp, l.availability, l.last_modified_timestamp FROM LISTINGS l
-            LEFT JOIN USERS u ON l.listing_user_id = u.user_id
-            WHERE ((l.listing_id = ?) AND (l.deleted = 0))
-            `, [listing_id], function(err, data){
+            SELECT u.username AS listing_user_username,
+            l.listing_id,
+            l.title,
+            l.description,
+            l.price,
+            l.listing_user_id,
+            l.created_timestamp,
+            l.availability,
+            l.last_modified_timestamp,
+            (SELECT COUNT(*) FROM LIKES li
+                WHERE (li.deleted = 0) AND (li.listing_id = ?)) num_likes
+            FROM (LISTINGS l LEFT JOIN USERS u ON l.listing_user_id = u.user_id)
+            WHERE (((l.listing_id = ?)) AND (l.deleted = 0));
+            `, [listing_id, listing_id], function(err, data){
                 if(err){
                     reject(err);
                 }
@@ -47,8 +57,21 @@ const listingsDB = {
     getUserListings(listing_user_id){
         return new Promise((resolve, reject) => {
             this.pool.query(`
-            SELECT * FROM LISTINGS
-            WHERE ((listing_user_id = ?) AND (deleted = 0))
+            SELECT 
+                l.listing_id,
+                l.title,
+                l.description,
+                l.price,
+                l.listing_user_id,
+                l.created_timestamp,
+                l.availability,
+                l.last_modified_timestamp,
+            COUNT(li.like_id) AS num_likes
+            FROM (LISTINGS l LEFT JOIN
+                (SELECT * FROM LIKES
+                    WHERE deleted = 0) li ON li.listing_id = l.listing_id)
+            WHERE ((l.listing_user_id = ?) AND (l.deleted = 0))
+            GROUP BY l.listing_id;
             `, [listing_user_id], function(err, data){
                 if(err){
                     reject(err);
@@ -78,9 +101,22 @@ const listingsDB = {
     getOtherListing(listing_user_id){
         return new Promise((resolve, reject) => {
             this.pool.query(`
-            SELECT u.username AS listing_user_username, l.listing_id, l.title, l.description, l.price, l.listing_user_id, l.created_timestamp, l.availability, l.last_modified_timestamp FROM LISTINGS l
-            LEFT JOIN USERS u ON l.listing_user_id = u.user_id
-            WHERE ((NOT (l.listing_user_id = ?)) AND (l.deleted = 0))
+            SELECT 
+                u.username AS listing_user_username,
+                l.listing_id,
+                l.title,
+                l.description,
+                l.price,
+                l.listing_user_id,
+                l.created_timestamp,
+                l.availability,
+                l.last_modified_timestamp,
+            COUNT(li.like_id) AS num_likes
+            FROM ((LISTINGS l LEFT JOIN USERS u ON l.listing_user_id = u.user_id) LEFT JOIN
+                (SELECT * FROM LIKES
+                    WHERE deleted = 0) li ON li.listing_id = l.listing_id)
+            WHERE ((NOT(l.listing_user_id = ?)) AND (l.deleted = 0))
+            GROUP BY l.listing_id;
             `, [listing_user_id], function(err, data){
                 if(err){
                     reject(err);

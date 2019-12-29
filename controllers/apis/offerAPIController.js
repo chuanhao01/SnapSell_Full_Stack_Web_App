@@ -16,7 +16,7 @@ const offerAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL_ERR',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }
@@ -58,7 +58,7 @@ const offerAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL_ERR',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }
@@ -99,7 +99,7 @@ const offerAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL_ERR',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }
@@ -131,7 +131,7 @@ const offerAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL_ERR',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }
@@ -164,7 +164,7 @@ const offerAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL_ERR',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }
@@ -196,7 +196,7 @@ const offerAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL_ERR',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }
@@ -228,7 +228,7 @@ const offerAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL_ERR',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }

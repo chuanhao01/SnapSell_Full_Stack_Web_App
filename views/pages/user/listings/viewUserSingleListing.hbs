@@ -19,6 +19,17 @@
                                 \{{listing.price}}
                             </span>
                         </article>
+                        <article>
+                            <span>Likes: \{{listing.num_likes}}</span>
+                        </article>
+                    </b-card-text>
+                    <b-card-text>
+                        <b-button variant="warning" :href='`/user/listing/edit/${listing.listing_id}`'>Edit</b-button>
+                        <b-button
+                        @click='deleteListing(listing.listing_id)'
+                        variant="danger">
+                            Delete
+                        </b-button>
                     </b-card-text>
                 </b-card>
             </template>
@@ -46,6 +57,21 @@
                 .catch(
                     function(err){
                         console.log(err.response);
+                    }
+                )
+            },
+            deleteListing(listing_id){
+                axios
+                .delete(`/api/listing/${listing_id}`)
+                .then(
+                    function(res){
+                        console.log(res);
+                        document.location.pathname = '/user/listing';
+                    }.bind(this)
+                )
+                .catch(
+                    function(err){
+                        console.log(err);
                     }
                 )
             }

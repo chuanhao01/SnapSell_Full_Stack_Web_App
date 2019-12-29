@@ -10,20 +10,60 @@ const likeAPIController = {
         app.post('/api/like/:listing_id', function(req, res){
             new Promise((resolve) => {
                 resolve(
-                    dataAccess.like.checkLike(req.params.listing_id, req.user.user_id)
+                    dataAccess.listing.checkIfUserListing(req.params.listing_id, req.user.user_id)
                     .catch(
                         function(err){
                             // If there is any MySQL errors
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL error',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }
                     )
                 );
             })
+            .then(
+                function(user_listing_own){
+                    return new Promise((resolve, reject) => {
+                        if(user_listing_own){
+                            const err = new Error('User liking his own post');
+                            err.code = 'USER_LIKING_OWN_LISTING';
+                            reject(err);
+                        }
+                        else{
+                            resolve(true);
+                        }
+                    })
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(401).send({
+                                'Error': 'User liking own post',
+                                'error_code': err.code
+                            });
+                            throw err.code;
+                        }
+                    );
+                }
+            )
+            .then(
+                function(){
+                    return dataAccess.like.checkLike(req.params.listing_id, req.user.user_id)
+                    .catch(
+                        function(err){
+                            // If there is any MySQL errors
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL error',
+                                'error_code': 'MySQL_ERR'
+                            });
+                            throw 'MySQL_ERR';
+                        }
+                    );
+                }
+            )
             .then(
                 function(user_like_before){
                     return new Promise((resolve, reject) => {
@@ -59,7 +99,7 @@ const likeAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL error',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }
@@ -92,7 +132,7 @@ const likeAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL error',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }
@@ -134,7 +174,7 @@ const likeAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL error',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }
@@ -166,7 +206,7 @@ const likeAPIController = {
                             console.log(err);
                             res.status(500).send({
                                 'Error': 'MySQL error',
-                                'error_code': err.code
+                                'error_code': 'MySQL_ERR'
                             });
                             throw 'MySQL_ERR';
                         }
