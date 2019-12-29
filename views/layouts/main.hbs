@@ -25,16 +25,20 @@
     <main id="app">
         <b-navbar type='dark' class="bg-secondary">
             <b-navbar-brand href='/user/home'>SnapSell</b-navbar-brand>
+            <b-nav-text
+            class="text-white">
+                Welcome {{user.username}}
+            </b-nav-text>
             {{#if user}}
             <b-navbar-nav class="ml-auto">
                 <b-nav-item-dropdown text="Profile">
-                    <b-dropdown-item href="#">View your profile</b-dropdown-item>
-                    <b-dropdown-item href="#">Edit your profile</b-dropdown-item>
+                    <b-dropdown-item href="/user/profile">View your profile</b-dropdown-item>
+                    <b-dropdown-item href="/user/profile/edit">Edit your profile</b-dropdown-item>
                 </b-nav-item-dropdown>                
                 <b-nav-item-dropdown text="Listings">
-                    <b-dropdown-item href="#">Add a listing</b-dropdown-item>
-                    <b-dropdown-item href="#">View your Listings</b-dropdown-item>
-                    <b-dropdown-item href="#">View other listings</b-dropdown-item>
+                    <b-dropdown-item href="/user/listing/add">Add a listing</b-dropdown-item>
+                    <b-dropdown-item href="/user/listing">View your Listings</b-dropdown-item>
+                    <b-dropdown-item href="/listing">View other listings</b-dropdown-item>
                 </b-nav-item-dropdown>                
                 <b-button class="btn btn-danger ml-2" id="logoutBtn" href='/logout'>
                     Logout
