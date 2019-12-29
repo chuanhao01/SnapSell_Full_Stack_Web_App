@@ -139,6 +139,92 @@ const usersDB = {
             });
         });
     },
+    editUserProfile(user_id, username, password, avatar_icon_file_name){
+        return new Promise((resolve, reject) => {
+            // First check if any other users are using the username you are trying to change to
+            this.pool.query(`
+            SELECT * FROM USERS
+            WHERE ((username = ?) AND (NOT(user_id = ?)) AND (deleted = 0)) 
+            `, [username, user_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else if(data.length > 0){
+                    const err = new Error('Username already exists');
+                    err.code = 'USERNAME_TAKEN';
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+
+        })
+        .then(
+            function(){
+                // If no one else is using the username
+                // Get the user details
+                return this.getUserByUserId(user_id);
+            }.bind(this)
+        )
+        .then(
+            function(user){
+                // First part here is to generate password hash
+                return new Promise((resolve, reject) => {
+                    bcrypt.hash(password, SALT_ROUNDS, function(err, password_hash){
+                        if(err){
+                            // If there are any bcrypt errors
+                            reject(err);
+                        }
+                        else{
+                            // If password_hash was successfully generated
+                            user.password_hash = password_hash;
+                            resolve(user);
+                        }
+                    });
+                });
+
+            }
+        )
+        .then(
+            function(user){
+                // If getting the user is successful
+                // Delete the user old avatar_icon
+                return new Promise((resolve, reject) => {
+                    const file_path = 'uploads/avatarIcons/' + user.avatar_icon_file_name;
+                    fs.unlink(file_path, function(err){
+                        if(err){
+                            // Somehow the file is not deleted
+                            reject(err);
+                        }
+                        else{
+                            resolve(user);
+                        }
+                    });
+                });
+            }
+        )
+        .then(
+            function(user){
+                // If the previous file is deleted
+                return new Promise((resolve, reject) => {
+                    this.pool.query(`
+                    UPDATE USERS
+                    SET username = ?, password = ?, avatar_icon_file_name = ?
+                    WHERE user_id = ?
+                    `, [username, user.password_hash, avatar_icon_file_name, user_id], function(err, data){
+                        if(err){
+                            // If there was an error updateing
+                            reject(err);
+                        }
+                        else{
+                            resolve(data);
+                        }
+                    });
+                });
+            }.bind(this)
+        );
+    },
     checkPassword(password, password_hash){
         return new Promise((resolve, reject) => {
             // Compares the two values

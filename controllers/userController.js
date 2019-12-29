@@ -23,6 +23,12 @@ const userController = {
                 'title': 'Looking at your own profile'
             });
         });
+        // Edit their profile
+        app.get('/user/profile/edit', function(req, res){
+            res.render(profile_parent_dir + 'editProfile', {
+                'title': 'Editing your profile'
+            });
+        });
         // Listings
         // Adding a listing
         app.get('/user/listing/add', function(req, res){
