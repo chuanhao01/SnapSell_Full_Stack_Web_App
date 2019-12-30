@@ -59,6 +59,7 @@ const utils = require('../../utils/index');
 const accountAPIController = {
     init(app){
         // When using axios to send a request, the data is stored in req.body
+        // Dealing with account, /api/account
         // Endpoint to create an account
         app.post('/api/account', function(req, res){
             upload(req, res, function(err){
@@ -288,6 +289,7 @@ const accountAPIController = {
                 }
             );
         });
+        // Endpoint to get a new access token based on refresh_token 
         app.get('/api/refresh_token', function(req, res){
             if(req.cookies.refresh_token){
                 // If refresh token exists

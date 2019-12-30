@@ -38,18 +38,6 @@ const userAPIController = {
                 }
             });
         });
-        // Gets the user's avatar_icon
-        app.get('/api/user/avatar_icon', function(req, res){
-            res.sendFile(process.cwd() + avatar_icon_file_base_path + req.user.avatar_icon_file_name, function(err){
-                if(err){
-                    console.log(err);
-                    res.status(500).send({
-                        'Error': 'Error retriving avatar',
-                        'error_code': 'GET_AVATAR_ERROR' 
-                    });
-                }
-            });
-        });
         // Edit user's profile
         app.put('/api/user', function(req, res){
             upload(req, res, function(err){
@@ -118,6 +106,19 @@ const userAPIController = {
                             console.log('Final catch err: ' + err);
                         }
                     );
+                }
+            });
+        });
+        // Dealing with avatar_icon, /api/user/avatar_icon
+        // Gets the user's avatar_icon
+        app.get('/api/user/avatar_icon', function(req, res){
+            res.sendFile(process.cwd() + avatar_icon_file_base_path + req.user.avatar_icon_file_name, function(err){
+                if(err){
+                    console.log(err);
+                    res.status(500).send({
+                        'Error': 'Error retriving avatar',
+                        'error_code': 'GET_AVATAR_ERROR' 
+                    });
                 }
             });
         });
