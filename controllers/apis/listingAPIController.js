@@ -258,6 +258,38 @@ const listingAPIController = {
                 }
             );
         });
+        // Get the pictures for a listing by id, this is a query to db, thats why it is pictures
+        app.get('/api/listing/pictures/:listing_id', function(req, res){
+            return new Promise((resolve) => {
+                resolve(
+                    dataAccess.listing.getListingPicturesById(req.params.listing_id)
+                    .catch(
+                        function(err){
+                            // If there was any MySQL errors
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL error',
+                                'error_code': 'MySQL_ERR'
+                            });
+                            throw 'MYSQL_ERR';
+                        }
+                    )
+                );
+            })
+            .then(
+                function(listing_pictures){
+                    // If getting the listing pictures were successful
+                    res.status(200).send({
+                        listing_pictures: listing_pictures
+                    });
+                }
+            )
+            .catch(
+                function(err){
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
         // Edit a listing
         app.put('/api/listing/:listing_id', function(req, res){
             new Promise((resolve) => {

@@ -69,7 +69,7 @@
                 .then(
                     function(res){
                         // If account creation is successful, redirect to login page
-                        window.location.pathname = '/';
+                        window.location.pathname = `/user/listing/${listing_id}`;
                     }
                 )
                 .catch(
