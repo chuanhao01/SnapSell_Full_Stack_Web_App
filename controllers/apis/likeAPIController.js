@@ -6,7 +6,7 @@ const dataAccess = require('../../db/index');
 
 const likeAPIController = {
     init(app){
-        // Affects likes directly by listing_id 
+        // Affects likes directly by listing_id, /api/like/:listing_id
         // Get information of likes on a listing
         app.get('/api/like/:listing_id', function(req, res){
              new Promise((resolve) => {

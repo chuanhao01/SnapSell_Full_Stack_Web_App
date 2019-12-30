@@ -6,6 +6,39 @@ const dataAccess = require('../../db/index');
 
 const offerAPIController = {
     init(app){
+        // Affecting offer by listing_id, /api/offer/:listing_id
+        // Get the offers for a listing
+        app.get('/api/offer/:listing_id', function(req, res){
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.offer.getOffersForAListing(req.params.listing_id)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL_ERR',
+                                'error_code': 'MySQL_ERR'
+                            });
+                            throw 'MySQL_ERR';
+                        }
+                    )
+                );
+            })
+            .then(
+                function(offers){
+                    // if the query for the offers was successful
+                    res.status(200).send({
+                        'offers': offers
+                    });
+                }
+            )
+            .catch(
+                function(err){
+                    // Final catch for all errors
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
         // Adding an offer for a listing 
         app.post('/api/offer/:listing_id', function(req, res){
             new Promise((resolve) => {
@@ -154,38 +187,7 @@ const offerAPIController = {
                 }
             );
         });
-        // Get the offers for a listing
-        app.get('/api/offer/:listing_id', function(req, res){
-            new Promise((resolve) => {
-                resolve(
-                    dataAccess.offer.getOffersForAListing(req.params.listing_id)
-                    .catch(
-                        function(err){
-                            console.log(err);
-                            res.status(500).send({
-                                'Error': 'MySQL_ERR',
-                                'error_code': 'MySQL_ERR'
-                            });
-                            throw 'MySQL_ERR';
-                        }
-                    )
-                );
-            })
-            .then(
-                function(offers){
-                    // if the query for the offers was successful
-                    res.status(200).send({
-                        'offers': offers
-                    });
-                }
-            )
-            .catch(
-                function(err){
-                    // Final catch for all errors
-                    console.log('Final catch err: ' + err);
-                }
-            );
-        });
+        // For checking the offer on the listing, /api/offer/check/:listing_id
         // Checks if the user has placed an offer on the listing, returns the boolean value 
         app.get('/api/offer/check/:listing_id', function(req, res){
             new Promise((resolve) => {
@@ -218,6 +220,7 @@ const offerAPIController = {
                 }
             );
         });
+        // /api/offer/user/:listing_id
         // Gets the offer the user has on the listing
         app.get('/api/offer/user/:listing_id', function(req, res){
             new Promise((resolve) => {
