@@ -26,6 +26,7 @@ const assignmentDB = {
         return new Promise((resolve, reject) => {
             this.pool.query(`
             SELECT * FROM USERS
+            WHERE deleted = 0
             `, function(err, data){
                 if(err){
                     reject(err);
@@ -102,7 +103,7 @@ const assignmentDB = {
         return new Promise((resolve, reject) => {
             this.pool.query(`
             SELECT * FROM USERS
-            WHERE user_id = ? 
+            WHERE ((user_id = ?) AND (deleted = 0))
             `, [user_id], function(err, data){
                 if(err || data.length === 0){
                     reject('MySQL error');
@@ -119,7 +120,7 @@ const assignmentDB = {
             // First check if any other users are using the username you are trying to change to
             this.pool.query(`
             SELECT * FROM USERS
-            WHERE ((username = ?) AND (NOT(user_id = ?))) 
+            WHERE ((username = ?) AND (NOT(user_id = ?)) AND (deleted = 0)) 
             `, [username, user_id], function(err, data){
                 if(err){
                     reject(err);
@@ -186,7 +187,7 @@ const assignmentDB = {
                     this.pool.query(`
                     UPDATE USERS
                     SET username = ?, password = ?, avatar_icon_file_name = ?
-                    WHERE user_id = ?
+                    WHERE ((user_id = ?) AND (deleted = 0))
                     `, [username, user.password_hash, avatar_icon_file_name, user_id], function(err, data){
                         if(err){
                             // If there was an error updateing
@@ -205,7 +206,7 @@ const assignmentDB = {
         return new Promise((resolve, reject) => {
             this.pool.query(`
             SELECT * FROM LISTINGS
-            WHERE listing_user_id = ? 
+            WHERE ((listing_user_id = ?) AND (deleted = 0))
             `, [user_id], function(err, data){
                 if(err){
                     reject(err);
@@ -221,6 +222,7 @@ const assignmentDB = {
         return new Promise((resolve, reject) => {
             this.pool.query(`
             SELECT * FROM LISTINGS
+            WHERE deleted = 0
             `, function(err, data){
                 if(err){
                     reject(err);
@@ -236,7 +238,7 @@ const assignmentDB = {
         return new Promise((resolve, reject) => {
             this.pool.query(`
             SELECT * FROM LISTINGS
-            WHERE listing_id = ? 
+            WHERE ((listing_id = ?) AND (deleted = 0))
             `, [listing_id], function(err, data){
                 if(err || data.length === 0){
                     // If there was a MySQL error or if no listings were returned
@@ -273,9 +275,11 @@ const assignmentDB = {
     // Q9 DELETE /listings/:listing_id
     deleteListings(listing_id){
         return new Promise((resolve, reject) => {
+            // Deletes the likes linked to the listing_id
             this.pool.query(`
-            DELETE FROM LISTINGS
-            WHERE listing_id = ? 
+            UPDATE LIKES
+            SET deleted = 1
+            WHERE ((listing_id = ?) AND (deleted = 0))
             `, [listing_id], function(err, data){
                 if(err){
                     reject(err);
@@ -284,7 +288,64 @@ const assignmentDB = {
                     resolve(data);
                 }
             });
-        });
+        })
+        .then(
+            function(){
+                // Delete the offers linked to the listing_id
+                return new Promise((resolve, reject) => {
+                    this.pool.query(`
+                    UPDATE OFFERS
+                    SET deleted = 1
+                    WHERE ((listing_id = ?) AND (deleted = 0))
+                    `, [listing_id], function(err, data){
+                        if(err){
+                            reject(err);
+                        }
+                        else{
+                            resolve(data);
+                        }
+                    });
+                });
+            }.bind(this)
+        )
+        .then(
+            function(){
+                // Delete the listing pictures
+                return new Promise((resolve, reject) => {
+                    this.pool.query(`
+                    UPDATE LISTING_PICTURES
+                    SET deleted = 1
+                    WHERE ((listing_id = ?) AND (deleted = 0))  
+                    `, [listing_id], function(err, data){
+                        if(err){
+                            reject(err);
+                        }
+                        else{
+                            resolve(data);
+                        }
+                    });
+                });
+            }.bind(this)
+        )
+        .then(
+            function(){
+                // Deletes the listing
+                return new Promise((resolve, reject) => {
+                    this.pool.query(`
+                    UPDATE LISTINGS
+                    SET deleted = 1
+                    WHERE ((listing_id = ?) AND (deleted = 0)) 
+                    `, [listing_id], function(err, data){
+                        if(err){
+                            reject(err);
+                        }
+                        else{
+                            resolve(data);
+                        }
+                    });
+                });
+            }.bind(this)
+        );
     },
     // Q10 PUT /listings/:id
     putListings(listing_id, title, description, price, listing_user_id){
@@ -292,7 +353,7 @@ const assignmentDB = {
             this.pool.query(`
             UPDATE LISTINGS
             SET title = ?, description = ?, price = ?, listing_user_id = ?
-            WHERE listing_id = ?
+            WHERE ((listing_id = ?) AND (deleted = 0))
             `, [title, description, price, listing_user_id, listing_id], function(err, data){
                 if(err){
                     reject(err);
@@ -308,7 +369,7 @@ const assignmentDB = {
         return new Promise((resolve, reject) => {
             this.pool.query(`
             SELECT * FROM OFFERS
-            WHERE listing_id = ?
+            WHERE ((listing_id = ?) AND (deleted = 0))
             `, [listing_id], function(err, data){
                 if(err){
                     reject(err);

@@ -9,11 +9,24 @@ Here req.user has all the information of the user
 const userController = {
     init(app){
         const parent_dir = 'pages/user/';
+        const profile_parent_dir = parent_dir + 'profile/';
         const listing_parent_dir = parent_dir + 'listings/';
         // users home page
         app.get('/user/home', function(req, res){
             res.render(parent_dir + 'userHome', {
                 'title': `Welcome ${req.user.username}`
+            });
+        });
+        // Looking at their own profile
+        app.get('/user/profile', function(req, res){
+            res.render(profile_parent_dir + 'viewProfile', {
+                'title': 'Looking at your own profile'
+            });
+        });
+        // Edit their profile
+        app.get('/user/profile/edit', function(req, res){
+            res.render(profile_parent_dir + 'editProfile', {
+                'title': 'Editing your profile'
             });
         });
         // Listings
@@ -33,6 +46,12 @@ const userController = {
         app.get('/user/listing/:listing_id', function(req, res){
             res.render(listing_parent_dir + 'viewUserSingleListing', {
                 'title': 'Looking at listing'
+            });
+        });
+        // Adding a picture to the listing
+        app.get('/user/listing/picture/add/:listing_id', function(req, res){
+            res.render(listing_parent_dir + 'addPicture', {
+                'title': 'Adding a picture to the listing'
             });
         });
         // Edit a specific listing
