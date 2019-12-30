@@ -42,11 +42,12 @@ const offersDB = {
             });
         });
     },
+    // Check if the user has placed an offer on the listing and return the boolean
     checkUserPlacedOffer(listing_id, offer_user_id){
         return new Promise((resolve, reject) =>{
             this.pool.query(`
             SELECT * from OFFERS 
-            WHERE ((listing_id = ?) AND (offer_user_id = ?)) 
+            WHERE ((listing_id = ?) AND (offer_user_id = ?) AND (deleted = 0)) 
             `, [listing_id, offer_user_id], function(err, data){
                 if(err){
                     reject(err);
@@ -62,11 +63,29 @@ const offersDB = {
             });
         });
     },
+    // Gets the current user offer
     getUserOffer(listing_id, offer_user_id){
         return new Promise((resolve, reject) =>{
             this.pool.query(`
             SELECT * from OFFERS
-            WHERE ((listing_id = ?) AND (offer_user_id = ?)) 
+            WHERE ((listing_id = ?) AND (offer_user_id = ?) AND (deleted = 0)) 
+            `, [listing_id, offer_user_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
+    },
+    // Delete the offer made by a user
+    deleteUserOffer(listing_id, offer_user_id){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            UPDATE OFFERS
+            SET deleted = 1
+            WHERE ((listing_id = ?) AND (offer_user_id = ?))  
             `, [listing_id, offer_user_id], function(err, data){
                 if(err){
                     reject(err);

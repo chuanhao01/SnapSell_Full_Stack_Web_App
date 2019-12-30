@@ -37,11 +37,13 @@
                                     <span>
                                         \{{listing.listing_user_username}}
                                     </span>
+                                    <p>
+                                        Likes: \{{listing.num_likes}}
+                                    </p>
                                 </article>
                             </b-card-text>
                             <b-card-text>
                                 <b-button variant="primary" :href='`/listing/${listing.listing_id}`'>View the listing</b-button>
-                                <b-button variant="warning" :href='`/listing/offer/${listing.listing_id}`'>Place an offering</b-button>
                             </b-card-text>
                         </b-card>
                     </template>
