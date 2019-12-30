@@ -65,7 +65,7 @@ const listingAPIController = {
             );
         });
         // Adding a picture to the listing
-        app.post('/api/listing/picture/:listing_id', function(req, res){
+        app.post('/api/listing/pictures/:listing_id', function(req, res){
             upload(req, res, function(err){
                 // Cataching errors in the file uploaded
                 if(err){
@@ -423,25 +423,14 @@ const listingAPIController = {
             )
             .then(
                 function(){
-                    // If the user does have access to the listing
-                    return dataAccess.listing.deleteAListing(req.params.listing_id)
-                    .catch(
-                        function(err){
-                            console.log(err);
-                            res.status(500).send({
-                                'Error': 'MySQL Error',
-                                'error_code': 'MySQL_ERR'
-                            });
-                            throw 'MySQL_ERR';
-                        }
-                    );
+                    
                 }
             )
             .then(
                 function(){
                     // If the listing was successfully deleted
                     res.status(200).send({
-                        'Result': 'Product was successfully deleted'
+                        'Result': 'Listing was successfully deleted'
                     });
                 }
             )

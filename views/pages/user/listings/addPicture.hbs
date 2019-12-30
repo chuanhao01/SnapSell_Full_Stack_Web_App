@@ -61,7 +61,7 @@
                 form_data.append('listing_picture', this.form.listing_picture);
                 // Post request sent here
                 axios
-                .post(`/api/listing/picture/${listing_id}`, form_data, {
+                .post(`/api/listing/pictures/${listing_id}`, form_data, {
                     headers:{
                         'Content-Type': 'multipart/form-data'
                     }

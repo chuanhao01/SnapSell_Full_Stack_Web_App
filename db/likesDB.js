@@ -66,6 +66,41 @@ const likesDB = {
             });
         });
     },
+    // Get the information of all likes on a listing
+    getLikesOfListing(listing_id){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT *
+            FROM ((
+            SELECT
+            li.like_id,
+            li.user_id AS like_user_id,
+            l.listing_id,
+            l.title,
+            l.description,
+            l.price,
+            l.listing_user_id,
+            u.username AS listing_user_username
+            FROM (((SELECT * FROM LIKES WHERE deleted = 0) li LEFT JOIN (SELECT * FROM LISTINGS WHERE deleted = 0) l ON li.listing_id = l.listing_id) LEFT JOIN
+                (SELECT * FROM USERS WHERE deleted = 0) u ON l.listing_user_id = u.user_id)
+            ) a INNER JOIN(
+            SELECT
+            li.like_id,
+            u.username AS like_user_username
+            FROM (((SELECT * FROM LIKES WHERE deleted = 0) li LEFT JOIN (SELECT * FROM LISTINGS WHERE deleted = 0) l ON li.listing_id = l.listing_id) LEFT JOIN
+                (SELECT * FROM USERS WHERE deleted = 0) u ON li.user_id = u.user_id)
+            ) b ON a.like_id = b.like_id)
+            WHERE a.listing_id = ?
+            `, [listing_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
+    }
 };
 
 module.exports = likesDB;

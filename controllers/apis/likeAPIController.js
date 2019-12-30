@@ -6,6 +6,78 @@ const dataAccess = require('../../db/index');
 
 const likeAPIController = {
     init(app){
+        // Get information of likes on a listing
+        app.get('/api/like/:listing_id', function(req, res){
+             new Promise((resolve) => {
+                resolve(
+                    dataAccess.listing.checkIfUserListing(req.params.listing_id, req.user.user_id)
+                    .catch(
+                        function(err){
+                            // If there is any MySQL errors
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL error',
+                                'error_code': 'MySQL_ERR'
+                            });
+                            throw 'MySQL_ERR';
+                        }
+                    )
+                );
+            })
+            .then(
+                function(user_listing_own){
+                    return new Promise((resolve, reject) => {
+                        if(user_listing_own){
+                            // If the user does own the listing
+                            resolve(true);
+                        }
+                        else{
+                            const err = new Error('You don\'t have permission to view this.');
+                            err.code = 'USER_NO_PERMISSION';
+                            reject(err);
+                        }
+                    })
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(401).send({
+                                'Error': 'You don\'t have permission to view this.',
+                                'error_code': err.code
+                            });
+                            throw err.code;
+                        }
+                    );
+                }
+            )
+            .then(
+                function(){
+                    return dataAccess.like.getLikesOfListing(req.params.listing_id)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL error',
+                                'error_code': 'MySQL_ERR'
+                            });
+                            throw 'MySQL_ERR';
+                        }
+                    );
+                }
+            )
+           .then(
+                function(likes){
+                    res.status(200).send({
+                        likes: likes
+                    });
+                }
+            )
+            .catch(
+                function(err){
+                    // Final catch for all errors
+                    console.log('Final catch err: ' + err);
+                }
+            );           
+        });
         // Add a like to a listing
         app.post('/api/like/:listing_id', function(req, res){
             new Promise((resolve) => {
