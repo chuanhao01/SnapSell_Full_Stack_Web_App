@@ -15,7 +15,7 @@ const upload = multer({
     // Throws a custom error if there is one
     fileFilter(req, file, cb){
         var ext = path.extname(file.originalname);
-        if(ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
+        if(ext !== '.jpg') {
             let err = new Error('File extension of uploaded file is wrong');
             err.code = 'FILE_EXT';
             return cb(err);
