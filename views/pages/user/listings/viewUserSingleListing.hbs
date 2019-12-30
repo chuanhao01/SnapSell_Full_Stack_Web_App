@@ -50,33 +50,32 @@
                 class="d-flex align-items-center"
                 >
                     <b-card-body
-                    style='width: 600px;'
+                    style='width: 600px; height: 480px;'
                     >
                         <template>
                             <b-carousel
                             id="carousel-1"
                             v-model="slide"
                             :interval="4000"
+                            no-animation
                             controls
                             indicators
                             background="#ababab"
-                            img-width="1024"
+                            img-width="600"
                             img-height="480"
                             style="text-shadow: 1px 1px 2px #333;"
                             @sliding-start="onSlideStart"
                             @sliding-end="onSlideEnd"
                             >
-                            <!-- Text slides with image -->
+                                <!-- Text slides with image -->
                                 <b-carousel-slide
                                 v-for='listing_picture of listing_pictures'
                                 :img-src='`/api/listing/picture/${listing_picture.listing_picture_file_name}`'
                                 >
                                 </b-carousel-slide>
                             </b-carousel>
-
                             <p class="mt-4">
-                            Slide #: \{{ slide }}<br>
-                            Sliding: \{{ sliding }}
+                            Picture #: \{{ slide + 1 }}
                             </p>
                         </template>
                     </b-card-body>
