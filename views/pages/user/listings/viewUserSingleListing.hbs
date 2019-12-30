@@ -50,7 +50,7 @@
                 class="d-flex align-items-center"
                 >
                     <b-card-body
-                    style='max-width: 1024px;'
+                    style='width: 600px;'
                     >
                         <template>
                             <b-carousel
@@ -68,7 +68,8 @@
                             >
                             <!-- Text slides with image -->
                                 <b-carousel-slide
-                                img-src="https://picsum.photos/1024/480/?image=52"
+                                v-for='listing_picture of listing_pictures'
+                                :img-src='`/api/listing/picture/${listing_picture.listing_picture_file_name}`'
                                 >
                                 </b-carousel-slide>
                             </b-carousel>

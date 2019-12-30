@@ -29,6 +29,7 @@ const dataAccess = require('../../db/index');
 
 const listingAPIController = {
     init(app){
+        const listing_picture_file_base_path = '/uploads/listingPictures/';
         // Adding a listing
         app.post('/api/listing', function(req, res){
             new Promise((resolve) => {
@@ -289,6 +290,17 @@ const listingAPIController = {
                     console.log('Final catch err: ' + err);
                 }
             );
+        });
+        app.get('/api/listing/picture/:listing_picture_file_name', function(req, res){
+            res.sendFile(process.cwd() + listing_picture_file_base_path + req.params.listing_picture_file_name, function(err){
+                if(err){
+                    console.log(err);
+                    res.status(500).send({
+                        'Error': 'Error retriving avatar',
+                        'error_code': 'GET_AVATAR_ERROR' 
+                    });
+                }
+            });
         });
         // Edit a listing
         app.put('/api/listing/:listing_id', function(req, res){
