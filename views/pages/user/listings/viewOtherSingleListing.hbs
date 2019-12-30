@@ -52,7 +52,56 @@
                     </b-card-text>
                 </b-card>
             </template>
-
+        </div>
+        <div 
+        class="col-12 text-center"
+        >
+            <template
+            v-if='listing'>
+                <b-card
+                :title='`Showing pictures of ${listing.title}`'
+                bg-variant='info'
+                class="d-flex align-items-center"
+                >
+                    <b-card-body
+                    style='width: 600px; height: 100%;'
+                    >
+                        <template
+                        v-if='listing_pictures.length'>
+                            <b-carousel
+                            id="carousel-1"
+                            v-model="slide"
+                            :interval="4000"
+                            no-animation
+                            controls
+                            indicators
+                            background="#ababab"
+                            img-width="600"
+                            img-height="480"
+                            style="text-shadow: 1px 1px 2px #333;"
+                            @sliding-start="onSlideStart"
+                            @sliding-end="onSlideEnd"
+                            >
+                                <!-- Text slides with image -->
+                                <b-carousel-slide
+                                v-for='listing_picture of listing_pictures'
+                                :img-src='`/api/listing/picture/${listing_picture.listing_picture_file_name}`'
+                                >
+                                </b-carousel-slide>
+                            </b-carousel>
+                            <p class="mt-4">
+                            Picture #: \{{ slide + 1 }}
+                            </p>
+                        </template>
+                        <template
+                        v-else>
+                            <article>
+                                <h4>This listing has no pictures</h4>
+                            </article>
+                        </template>
+                    </b-card-body>
+                </b-card>
+            </template>
         </div>
         <div class="col-12 mt-3">
             <article class="d-block">
@@ -61,7 +110,7 @@
                 </h3>
             </article>
             <template
-            v-if='offers'>
+            v-if='offers.length'>
                 <b-card
                 v-for='offer in offers'
                 :bg-variant='offer.status ? "warning" : "primary"'
@@ -82,6 +131,12 @@
                     </b-card-text>
                 </b-card>
             </template>
+            <template
+            v-else>
+                <article class="text-center">
+                    <h4>There are no offers for this listing</h4>
+                </article>
+            </template>
         </div>
     </div>    
 </main>
@@ -92,9 +147,15 @@
         el: '#app',
         data: {
             listing: null,
-            offers: null,
-            offer_placed: null,
+            // For likes
             like_before: null,
+            // For listing pictures
+            listing_pictures: [],
+            slide: 0,
+            sliding: null,
+            // For offers
+            offers: [],
+            offer_placed: null,
         },
         methods: {
             getListing(){
@@ -207,6 +268,30 @@
                         console.log(err);
                     }
                 )
+            },
+            // Get the pictures for the listing
+            getListingPictures(){
+                const listing_id = window.location.pathname.split("/").pop();
+                axios
+                .get(`/api/listing/pictures/${listing_id}`)
+                .then(
+                    function(res){
+                        console.log(res);
+                        this.listing_pictures = res.data.listing_pictures;
+                    }.bind(this)
+                )
+                .catch(
+                    function(err){
+                        console.log(err);
+                    }
+                )
+            },
+            // Methods for carousel
+            onSlideStart(slide) {
+                this.sliding = true
+            },
+            onSlideEnd(slide) {
+                this.sliding = false
             }
         },
         created(){
@@ -214,6 +299,7 @@
             this.getOffers();
             this.checkOfferMade();
             this.checkLike();
+            this.getListingPictures();
         }
     });
 </script>

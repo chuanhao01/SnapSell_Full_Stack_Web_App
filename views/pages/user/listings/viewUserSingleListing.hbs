@@ -43,16 +43,17 @@
         class="col-12 text-center"
         >
             <template
-            v-if='listing && listing_pictures'>
+            v-if='listing'>
                 <b-card
                 :title='`Showing pictures of ${listing.title}`'
                 bg-variant='info'
                 class="d-flex align-items-center"
                 >
                     <b-card-body
-                    style='width: 600px; height: 480px;'
+                    style='width: 600px; height: 100%;'
                     >
-                        <template>
+                        <template
+                        v-if='listing_pictures.length'>
                             <b-carousel
                             id="carousel-1"
                             v-model="slide"
@@ -78,8 +79,49 @@
                             Picture #: \{{ slide + 1 }}
                             </p>
                         </template>
+                        <template
+                        v-else>
+                            <article>
+                                <h4>This listing has no pictures</h4>
+                            </article>
+                        </template>
                     </b-card-body>
                 </b-card>
+            </template>
+        </div>
+        <div class="col-12 mt-3">
+            <article class="d-block">
+                <h3 class="d-block text-center">
+                    Offers for this listing
+                </h3>
+            </article>
+            <template
+            v-if='offers.length'>
+                <b-card
+                v-for='offer in offers'
+                :bg-variant='offer.status ? "warning" : "primary"'
+                >
+                    <b-card-text>
+                        <article class="d-block">
+                            <span class="font-weight-bold">Offer price: </span>
+                            <span>
+                                \{{offer.offer_price}}
+                            </span>
+                        </article>
+                        <article class="d-block">
+                            <span class="font-weight-bold">By: </span>
+                            <span>
+                                \{{offer.offer_user_username}}
+                            </span>
+                        </article>
+                    </b-card-text>
+                </b-card>
+            </template>
+            <template
+            v-else>
+                <article class="text-center">
+                    <h4>There are no offers for this listing</h4>
+                </article>
             </template>
         </div>
     </div>    
@@ -92,9 +134,11 @@
         data: {
             listing: null,
             // listing_pictures is an arr, returned from the api
-            listing_pictures: null,
+            listing_pictures: [],
             slide: 0,
-            sliding: null
+            sliding: null,
+            // For offers
+            offers: [],
         },
         methods: {
             getListing(){
@@ -149,11 +193,29 @@
             },
             onSlideEnd(slide) {
                 this.sliding = false
-            }
+            },
+            // Offers
+            getOffers(){
+                const listing_id = window.location.pathname.split("/").pop();
+                axios
+                .get(`/api/offer/${listing_id}`)
+                .then(
+                    function(res){
+                        this.offers = res.data.offers
+                    }.bind(this)
+                )
+                .catch(
+                    function(err){
+                        console.log(err);
+                        throw 'GET_ERR';
+                    }
+                )
+            },
         },
         created(){
             this.getListing();
             this.getListingPictures();
+            this.getOffers();
         }
     });
 </script>
