@@ -48,6 +48,12 @@ const userController = {
                 'title': 'Looking at listing'
             });
         });
+        // Adding a picture to the listing
+        app.get('/user/listing/picture/add/:listing_id', function(req, res){
+            res.render(listing_parent_dir + 'addPicture', {
+                'title': 'Adding a picture to the listing'
+            });
+        });
         // Edit a specific listing
         app.get('/user/listing/edit/:listing_id', function(req, res){
             res.render(listing_parent_dir + 'editUserSingleListing', {

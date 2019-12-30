@@ -1,6 +1,29 @@
 // This file contains controllers pertaining to:
 // Anything that has to do with listings such as the CRUD of listings
 
+// Importing other libs
+const path = require('path');
+const multer = require('multer');
+const upload = multer({
+    // Setting the destination where the avatar icons are stored
+    dest: 'uploads/listingPictures/',
+    limits: {
+        // 1MB limit for file upload
+        fileSize: 1000000,
+    },
+    // Custom file filter function, only accepting file with image extensions
+    // Throws a custom error if there is one
+    fileFilter(req, file, cb){
+        var ext = path.extname(file.originalname);
+        if(ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
+            let err = new Error('File extension of uploaded file is wrong');
+            err.code = 'FILE_EXT';
+            return cb(err);
+        }
+        return cb(null, true);
+    }
+}).single('listing_picture');
+
 // Importing dataAccess object to interface with the DB
 const dataAccess = require('../../db/index');
 
@@ -39,6 +62,113 @@ const listingAPIController = {
                     console.log('Final catch err: ' + err);
                 }
             );
+        });
+        // Adding a picture to the listing
+        app.post('/api/listing/picture/:listing_id', function(req, res){
+            upload(req, res, function(err){
+                // Cataching errors in the file uploaded
+                if(err){
+                    // File extension is not an img
+                    if(err.code === 'FILE_EXT'){
+                        res.status(422).send({
+                            'Error': 'Wrong file extension',
+                            'error_code': err.code
+                        });
+                        return;
+                    }
+                    // File uploaded is too large
+                    else if(err.code === 'LIMIT_FILE_SIZE'){
+                        res.status(413).send({
+                            'Error': 'File sent is too large',
+                            'error_code': err.code
+                        });
+                        return;
+                    }
+                    else{
+                        res.status(500).send({
+                            'Error': 'Multer error',
+                            'error_code': err.code
+                        });
+                        return;
+                    }
+                }
+                else{
+                    // If there is no error in uploading the file
+                    // Try to add the picture
+                    new Promise((resolve) => {
+                        resolve(
+                            dataAccess.listing.checkIfUserListing(req.params.listing_id, req.user.user_id)
+                            .catch(
+                                function(err){
+                                    // If there was any MySQL errors
+                                    console.log(err);
+                                    res.status(500).send({
+                                        'Error': 'MySQL error',
+                                        'error_code': 'MySQL_ERR'
+                                    });
+                                    throw 'MYSQL_ERR';
+                                }
+                            )
+                       );
+                    })
+                    .then(
+                        function(user_listing_own){
+                            return new Promise((resolve, reject) => {
+                                if(user_listing_own){
+                                    resolve(true);
+                                }
+                                else{
+                                    // If they dont own the listing
+                                    const err = new Error('Listing does not belong to user');
+                                    err.code = 'USER_UNAUTH_LISTING';
+                                    reject(err);
+                                }
+                            })
+                            .catch(
+                                function(err){
+                                    console.log(err);
+                                    res.status(401).send({
+                                        'Error': 'You cannot add a picture to this listing',
+                                        'error_code': 'USER_UNAUTH_LISTING'
+                                    });
+                                    throw err.code;
+                                }
+                            );
+                        }
+                    )
+                    .then(
+                        function(){
+                            // If the user owns the listing
+                            return dataAccess.listing.addPictureToListing(req.params.listing_id, req.file.filename)
+                            .catch(
+                                function(err){
+                                    // If there was any MySQL errors
+                                    console.log(err);
+                                    res.status(500).send({
+                                        'Error': 'MySQL error',
+                                        'error_code': 'MySQL_ERR'
+                                    });
+                                    throw 'MYSQL_ERR';
+                                }
+                            );
+                        }
+                    )
+                    .then(
+                        function(){
+                            // If creating a user is successful
+                            res.status(201).send({
+                                'Result': 'Picture successfully added'
+                            });
+                        }
+                    )
+                    .catch(
+                        function(err){
+                            // Final catch for all errors
+                            console.log('Final catch err: ' + err);
+                        }
+                    );
+                }
+            });
         });
         // Getting all the listing for a particular user
         app.get('/api/listing', function(req, res){
@@ -128,6 +258,7 @@ const listingAPIController = {
                 }
             );
         });
+        // Edit a listing
         app.put('/api/listing/:listing_id', function(req, res){
             new Promise((resolve) => {
                 resolve(

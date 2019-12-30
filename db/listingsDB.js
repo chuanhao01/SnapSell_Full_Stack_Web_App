@@ -162,7 +162,26 @@ const listingsDB = {
                 }
             });
         });
-    }
+    },
+    // Dealing with listing images here
+    // Adding a picture to a listing
+    addPictureToListing(listing_id, listing_picture_file_name){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            INSERT INTO LISTING_PICTURES
+            (listing_id, listing_picture_file_name, deleted)
+            VALUES
+            (?, ?, ?)
+            `, [listing_id, listing_picture_file_name, 0], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
+    }    
 };
 
 module.exports = listingsDB;

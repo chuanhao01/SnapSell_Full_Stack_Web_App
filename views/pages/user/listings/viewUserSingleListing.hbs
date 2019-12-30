@@ -24,6 +24,11 @@
                         </article>
                     </b-card-text>
                     <b-card-text>
+                        <b-button variant='primary' :href='`/user/listing/picture/add/${listing.listing_id}`'>
+                            Add an image to your listing
+                        </b-button>
+                    </b-card-text>
+                    <b-card-text>
                         <b-button variant="warning" :href='`/user/listing/edit/${listing.listing_id}`'>Edit</b-button>
                         <b-button
                         @click='deleteListing(listing.listing_id)'
