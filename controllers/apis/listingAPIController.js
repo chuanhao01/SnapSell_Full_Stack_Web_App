@@ -423,7 +423,17 @@ const listingAPIController = {
             )
             .then(
                 function(){
-                    
+                    return dataAccess.listing.deleteAListing(req.params.listing_id)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL Error',
+                                'error_code': 'MySQL_ERR'
+                            });
+                            throw 'MySQL_ERR';
+                        }
+                    );
                 }
             )
             .then(

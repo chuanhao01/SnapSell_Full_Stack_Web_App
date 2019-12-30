@@ -149,10 +149,11 @@ const listingsDB = {
     },
     deleteAListing(listing_id){
         return new Promise((resolve, reject) => {
+            // Deletes the likes linked to the listing_id
             this.pool.query(`
-            UPDATE LISTINGS
+            UPDATE LIKES
             SET deleted = 1
-            WHERE listing_id = ?
+            WHERE ((listing_id = ?) AND deleted = 0)
             `, [listing_id], function(err, data){
                 if(err){
                     reject(err);
@@ -161,7 +162,64 @@ const listingsDB = {
                     resolve(data);
                 }
             });
-        });
+        })
+        .then(
+            function(){
+                // Delete the offers linked to the listing_id
+                return new Promise((resolve, reject) => {
+                    this.pool.query(`
+                    UPDATE OFFERS
+                    SET deleted = 1
+                    WHERE ((listing_id = ?) AND (deleted = 0))
+                    `, [listing_id], function(err, data){
+                        if(err){
+                            reject(err);
+                        }
+                        else{
+                            resolve(data);
+                        }
+                    });
+                });
+            }.bind(this)
+        )
+        .then(
+            function(){
+                // Delete the listing pictures
+                return new Promise((resolve, reject) => {
+                    this.pool.query(`
+                    UPDATE LISTING_PICTURES
+                    SET deleted = 1
+                    WHERE ((listing_id = ?) AND (deleted = 0))  
+                    `, [listing_id], function(err, data){
+                        if(err){
+                            reject(err);
+                        }
+                        else{
+                            resolve(data);
+                        }
+                    });
+                });
+            }.bind(this)
+        )
+        .then(
+            function(){
+                // Deletes the listing
+                return new Promise((resolve, reject) => {
+                    this.pool.query(`
+                    UPDATE LISTINGS
+                    SET deleted = 1
+                    WHERE ((listing_id = ?) AND (deleted = 0)) 
+                    `, [listing_id], function(err, data){
+                        if(err){
+                            reject(err);
+                        }
+                        else{
+                            resolve(data);
+                        }
+                    });
+                });
+            }.bind(this)
+        );
     },
     // Dealing with listing images here
     // Adding a picture to a listing
