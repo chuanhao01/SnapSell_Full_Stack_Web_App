@@ -26,6 +26,7 @@ const upload = multer({
 
 // Importing dataAccess object to interface with the DB
 const dataAccess = require('../../db/index');
+const utils = require('../../utils/index');
 
 const userAPIController = {
     init(app){
@@ -41,6 +42,12 @@ const userAPIController = {
         // Edit user's profile
         app.put('/api/user', function(req, res){
             upload(req, res, function(err){
+                if(utils.validation.checkEmpty(req.body)){
+                    res.status(500).send({
+                        'Error': 'Some fields are empty'
+                    });
+                    return;
+                }
                 // Cataching errors in the file uploaded
                 if(err){
                     // File extension is not an img
@@ -68,44 +75,51 @@ const userAPIController = {
                     }
                 }
                 else{
-                    // If there is no error in uploading the file
-                    // Try to update the user
-                    new Promise((resolve) => {
-                        resolve(
-                            dataAccess.user.editUserProfile(req.user.user_id, req.body.username, req.body.password, req.file.filename)
-                            .catch(
-                                function(err){
-                                    console.log(err);
-                                    if(err.code === 'USERNAME_TAKEN'){
-                                        // If the user alr exists and there is this error
-                                        res.status(422).send({
-                                            'Condition': 'The new username provided already exists.',
-                                            'error_code': 'USERNAME_TAKEN'
-                                        });
+                    if(req.file === undefined){
+                        res.status(500).send({
+                            'Error': 'File is missing'
+                        });
+                    }
+                    else{
+                        // If there is no error in uploading the file
+                        // Try to update the user
+                        new Promise((resolve) => {
+                            resolve(
+                                dataAccess.user.editUserProfile(req.user.user_id, req.body.username, req.body.password, req.file.filename)
+                                .catch(
+                                    function(err){
+                                        console.log(err);
+                                        if(err.code === 'USERNAME_TAKEN'){
+                                            // If the user alr exists and there is this error
+                                            res.status(422).send({
+                                                'Condition': 'The new username provided already exists.',
+                                                'error_code': 'USERNAME_TAKEN'
+                                            });
+                                        }
+                                        else{
+                                            // Any other error
+                                            res.status(500).send({
+                                                'Error': 'Internal Error editing profile',
+                                                'error_code': 'INTERNAL_ERROR'
+                                            });
+                                        }
+                                        throw 'EDIT_USER_ERR';
                                     }
-                                    else{
-                                        // Any other error
-                                        res.status(500).send({
-                                            'Error': 'Internal Error editing profile',
-                                            'error_code': 'INTERNAL_ERROR'
-                                        });
-                                    }
-                                    throw 'EDIT_USER_ERR';
-                                }
-                            )
+                                )
+                            );
+                        })
+                        .then(
+                            function(){
+                                // If the update is successful
+                                res.status(204).send();
+                            }
+                        )
+                        .catch(
+                            function(err){
+                                console.log('Final catch err: ' + err);
+                            }
                         );
-                    })
-                    .then(
-                        function(){
-                            // If the update is successful
-                            res.status(204).send();
-                        }
-                    )
-                    .catch(
-                        function(err){
-                            console.log('Final catch err: ' + err);
-                        }
-                    );
+                    }
                 }
             });
         });
