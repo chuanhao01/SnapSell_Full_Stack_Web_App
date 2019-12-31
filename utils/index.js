@@ -2,9 +2,11 @@
 
 // Importing the other utils
 const jwtUtils = require('./jwtUtils');
+const validtionUtils = require('./validationUtils');
 
 const utils = {
     'jwt': jwtUtils,
+    'validation': validtionUtils
 };
 
 module.exports = utils;
