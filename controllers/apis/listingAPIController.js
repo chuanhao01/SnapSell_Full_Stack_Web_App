@@ -26,6 +26,7 @@ const upload = multer({
 
 // Importing dataAccess object to interface with the DB
 const dataAccess = require('../../db/index');
+const utils = require('../../utils/index');
 
 const listingAPIController = {
     init(app){
@@ -364,80 +365,89 @@ const listingAPIController = {
                     }
                 }
                 else{
-                    // If there is no error in uploading the file
-                    // Try to add the picture
-                    new Promise((resolve) => {
-                        resolve(
-                            dataAccess.listing.checkIfUserListing(req.params.listing_id, req.user.user_id)
-                            .catch(
-                                function(err){
-                                    // If there was any MySQL errors
-                                    console.log(err);
-                                    res.status(500).send({
-                                        'Error': 'MySQL error',
-                                        'error_code': 'MySQL_ERR'
-                                    });
-                                    throw 'MYSQL_ERR';
-                                }
-                            )
-                       );
-                    })
-                    .then(
-                        function(user_listing_own){
-                            return new Promise((resolve, reject) => {
-                                if(user_listing_own){
-                                    resolve(true);
-                                }
-                                else{
-                                    // If they dont own the listing
-                                    const err = new Error('Listing does not belong to user');
-                                    err.code = 'USER_UNAUTH_LISTING';
-                                    reject(err);
-                                }
-                            })
-                            .catch(
-                                function(err){
-                                    console.log(err);
-                                    res.status(401).send({
-                                        'Error': 'You cannot add a picture to this listing',
-                                        'error_code': 'USER_UNAUTH_LISTING'
-                                    });
-                                    throw err.code;
-                                }
+                    if(req.file === undefined){
+                        // Check if file was not empty
+                        res.status(500).send({
+                            'Error': 'File is empty'
+                        });
+                        return;
+                    }
+                    else{
+                        // If there is no error in uploading the file
+                        // Try to add the picture
+                        new Promise((resolve) => {
+                            resolve(
+                                dataAccess.listing.checkIfUserListing(req.params.listing_id, req.user.user_id)
+                                .catch(
+                                    function(err){
+                                        // If there was any MySQL errors
+                                        console.log(err);
+                                        res.status(500).send({
+                                            'Error': 'MySQL error',
+                                            'error_code': 'MySQL_ERR'
+                                        });
+                                        throw 'MYSQL_ERR';
+                                    }
+                                )
                             );
-                        }
-                    )
-                    .then(
-                        function(){
-                            // If the user owns the listing
-                            return dataAccess.listing.addPictureToListing(req.params.listing_id, req.file.filename)
-                            .catch(
-                                function(err){
-                                    // If there was any MySQL errors
-                                    console.log(err);
-                                    res.status(500).send({
-                                        'Error': 'MySQL error',
-                                        'error_code': 'MySQL_ERR'
-                                    });
-                                    throw 'MYSQL_ERR';
-                                }
-                            );
-                        }
-                    )
-                    .then(
-                        function(){
-                            // If creating a user is successful
-                            res.status(201).send({
-                                'Result': 'Picture successfully added'
-                            });
-                        }
-                    )
-                    .catch(
-                        function(err){
-                            // Final catch for all errors
-                            console.log('Final catch err: ' + err);
-                        }
-                    );
+                        })
+                        .then(
+                            function(user_listing_own){
+                                return new Promise((resolve, reject) => {
+                                    if(user_listing_own){
+                                        resolve(true);
+                                    }
+                                    else{
+                                        // If they dont own the listing
+                                        const err = new Error('Listing does not belong to user');
+                                        err.code = 'USER_UNAUTH_LISTING';
+                                        reject(err);
+                                    }
+                                })
+                                .catch(
+                                    function(err){
+                                        console.log(err);
+                                        res.status(401).send({
+                                            'Error': 'You cannot add a picture to this listing',
+                                            'error_code': 'USER_UNAUTH_LISTING'
+                                        });
+                                        throw err.code;
+                                    }
+                                );
+                            }
+                        )
+                        .then(
+                            function(){
+                                // If the user owns the listing
+                                return dataAccess.listing.addPictureToListing(req.params.listing_id, req.file.filename)
+                                .catch(
+                                    function(err){
+                                        // If there was any MySQL errors
+                                        console.log(err);
+                                        res.status(500).send({
+                                            'Error': 'MySQL error',
+                                            'error_code': 'MySQL_ERR'
+                                        });
+                                        throw 'MYSQL_ERR';
+                                    }
+                                );
+                            }
+                        )
+                        .then(
+                            function(){
+                                // If creating a user is successful
+                                res.status(201).send({
+                                    'Result': 'Picture successfully added'
+                                });
+                            }
+                        )
+                        .catch(
+                            function(err){
+                                // Final catch for all errors
+                                console.log('Final catch err: ' + err);
+                            }
+                        );
+                    }
                 }
             });
         });

@@ -63,106 +63,123 @@ const accountAPIController = {
         // Endpoint to create an account
         app.post('/api/account', function(req, res){
             upload(req, res, function(err){
-                // Cataching errors in the file uploaded
-                if(err){
-                    // File extension is not an img
-                    if(err.code === 'FILE_EXT'){
-                        res.status(422).send({
-                            'Error': 'Wrong file extension',
-                            'error_code': err.code
-                        });
-                        return;
-                    }
-                    // File uploaded is too large
-                    else if(err.code === 'LIMIT_FILE_SIZE'){
-                        res.status(413).send({
-                            'Error': 'File sent is too large',
-                            'error_code': err.code
-                        });
-                        return;
-                    }
-                    else{
-                        res.status(500).send({
-                            'Error': 'Multer error',
-                            'error_code': err.code
-                        });
-                        return;
-                    }
+                if(utils.validation.checkEmpty(req.body)){
+                    // If the field is empty
+                    res.status(500).send({
+                        'Error': 'Some fields are empty'
+                    });
+                    return;
                 }
                 else{
-                    // If there is no error in uploading the file
-                    // Trying to Creating the new user now
-                    // Below is the format for handling promises from dataAccess
-                    new Promise((resolve) => {
-                        resolve(
-                            dataAccess.user.getUserByUsername(req.body.username)
-                            .catch(
-                                function(err){
-                                    console.log(err);
-                                    res.status(500).send({
-                                        'Error': 'MySQL_ERR',
-                                        'error_code': err.code
-                                    });
+                    // Cataching errors in the file uploaded
+                    if(err){
+                        // File extension is not an img
+                        if(err.code === 'FILE_EXT'){
+                            res.status(422).send({
+                                'Error': 'Wrong file extension',
+                                'error_code': err.code
+                            });
+                            return;
+                        }
+                        // File uploaded is too large
+                        else if(err.code === 'LIMIT_FILE_SIZE'){
+                            res.status(413).send({
+                                'Error': 'File sent is too large',
+                                'error_code': err.code
+                            });
+                            return;
+                        }
+                        else{
+                            res.status(500).send({
+                                'Error': 'Multer error',
+                                'error_code': err.code
+                            });
+                            return;
+                        }
+                    }
+                    else{
+                        if(req.file === undefined){
+                            // Check if file was not empty
+                            res.status(500).send({
+                                'Error': 'File is empty'
+                            });
+                            return;
+                        }
+                        else{
+                            // If there is no error in uploading the file
+                            // Trying to Creating the new user now
+                            new Promise((resolve) => {
+                                resolve(
+                                    dataAccess.user.getUserByUsername(req.body.username)
+                                    .catch(
+                                        function(err){
+                                            console.log(err);
+                                            res.status(500).send({
+                                                'Error': 'MySQL_ERR',
+                                                'error_code': err.code
+                                            });
+                                        }
+                                    )
+                                );
+                            })
+                            .then(
+                                function(user){
+                                    // Check if the username is taken
+                                    return new Promise((resolve, reject) => {
+                                        if(user.length === 0){
+                                            // No one else has the username
+                                            resolve(true);
+                                        }
+                                        else{
+                                            const err = new Error('Username already taken');
+                                            err.code = 'USERNAME_TAKEN';
+                                            reject(err);
+                                        }
+                                    })
+                                    .catch(
+                                        function(err){
+                                            // If the username is already taken
+                                            console.log(err);
+                                            res.status(403).send({
+                                                'Error': 'Username already taken',
+                                                'error_code': err.code
+                                            });
+                                            throw err.code;
+                                        }
+                                    );
                                 }
                             )
-                        );
-                    })
-                    .then(
-                        function(user){
-                            // Check if the username is taken
-                            return new Promise((resolve, reject) => {
-                                if(user.length === 0){
-                                    // No one else has the username
-                                    resolve(true);
+                            .then(
+                                // If the username is not taken
+                                function(){
+                                    return dataAccess.user.createANewUser(req.file.filename, req.body.username, req.body.password)
+                                    .catch(
+                                        function(err){
+                                            // If there are any erros deal with it here and raise it to the final catch
+                                            console.log(err);
+                                            res.status(500).send({
+                                                'Error': 'Error creating a user',
+                                                'error_code': err.code
+                                            });
+                                            throw 'CREATE_USER_ERR';
+                                        }
+                                    );
                                 }
-                                else{
-                                    const err = new Error('Username already taken');
-                                    err.code = 'USERNAME_TAKEN';
-                                    reject(err);
+                            )
+                            .then(
+                                function(){
+                                    // If creating a user is successful
+                                    res.status(201).send({'Result': 'User successfully created'});
                                 }
-                            })
+                            )
                             .catch(
                                 function(err){
-                                    // If the username is already taken
-                                    console.log(err);
-                                    res.status(403).send({
-                                        'Error': 'Username already taken',
-                                        'error_code': err.code
-                                    });
-                                    throw err.code;
+                                    // Final catch for all errors
+                                    console.log('Final catch err: ' + err);
                                 }
                             );
                         }
-                    )
-                    .then(
-                        // If the username is not taken
-                        function(){
-                            return dataAccess.user.createANewUser(req.file.filename, req.body.username, req.body.password)
-                            .catch(
-                                function(err){
-                                    // If there are any erros deal with it here and raise it to the final catch
-                                    console.log(err);
-                                    res.status(500).send({
-                                        'Error': 'Error creating a user',
-                                        'error_code': err.code
-                                    });
-                                    throw 'CREATE_USER_ERR';
-                                }
-                            );
-                        }
-                    )
-                    .then(
-                        function(){
-                            // If creating a user is successful
-                            res.status(201).send({'Result': 'User successfully created'});
-                        }
-                    )
-                    .catch(
-                        function(err){
-                            // Final catch for all errors
-                            console.log('Final catch err: ' + err);
-                        }
-                    );
+                    }
                 }
             });
         });
