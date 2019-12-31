@@ -26,6 +26,7 @@ const upload = multer({
 
 // Importing dataAccess object to interface with the DB
 const dataAccess = require('../../db/index');
+const utils = require('../../utils/index');
 
 const listingAPIController = {
     init(app){
@@ -65,37 +66,45 @@ const listingAPIController = {
         });
         // Adding a listing
         app.post('/api/listing', function(req, res){
-            new Promise((resolve) => {
-                resolve(
-                    // Tries to create a new listing based on request
-                    dataAccess.listing.createANewListing(req.body.title, req.body.description, req.body.price, req.user.user_id)
-                    .catch(
-                        function(err){
-                            // If there is any MySQL errors
-                            console.log(err);
-                            res.status(500).send({
-                                'Error': 'MySQL error',
-                                'error_code': 'MySQL_ERR'
-                            });
-                            throw 'MySQL_ERR';
-                        }
-                    )
+            if(utils.validation.checkEmpty(req.body)){
+                // Checks if any of the fields are empty
+                res.status(500).send({
+                    'Error': 'Some fields are empty'
+                });
+            }
+            else{
+                new Promise((resolve) => {
+                    resolve(
+                        // Tries to create a new listing based on request
+                        dataAccess.listing.createANewListing(req.body.title, req.body.description, req.body.price, req.user.user_id)
+                        .catch(
+                            function(err){
+                                // If there is any MySQL errors
+                                console.log(err);
+                                res.status(500).send({
+                                    'Error': 'MySQL error',
+                                    'error_code': 'MySQL_ERR'
+                                });
+                                throw 'MySQL_ERR';
+                            }
+                        )
+                    );
+                })
+                .then(
+                    function(){
+                        // If the listing is created 
+                        res.status(201).send({
+                            'Result': 'Listing successfully created'
+                        });
+                    }
+                )
+                .catch(
+                    function(err){
+                        // Final catch for all errors
+                        console.log('Final catch err: ' + err);
+                    }
                 );
-            })
-            .then(
-                function(){
-                    // If the listing is created 
-                    res.status(201).send({
-                        'Result': 'Listing successfully created'
-                    });
-                }
-            )
-            .catch(
-                function(err){
-                    // Final catch for all errors
-                    console.log('Final catch err: ' + err);
-                }
-            );
+            }
         });
         // Afftecting the listing by its id, /api/listing/:listing_id
         // Getting a listing by listing_id
@@ -156,79 +165,88 @@ const listingAPIController = {
         });
         // Edit a listing
         app.put('/api/listing/:listing_id', function(req, res){
-            new Promise((resolve) => {
-                resolve(
-                    dataAccess.listing.checkIfUserListing(req.params.listing_id, req.user.user_id)
-                    .catch(
-                        function(err){
-                            // If there are any MySQL errors
-                            console.log(err);
-                            res.status(500).send({
-                                'Error': 'MySQL Error',
-                                'error_code': 'MySQL_ERR'
-                            });
-                            throw 'MySQL_ERR';
-                        }
-                    )
+            if(utils.validation.checkEmpty(req.body)){
+                // Checks if any of the fields are empty
+                res.status(500).send({
+                    'Error': 'Some fields are empty'
+                });
+            }
+            else{
+                new Promise((resolve) => {
+                    resolve(
+                        dataAccess.listing.checkIfUserListing(req.params.listing_id, req.user.user_id)
+                        .catch(
+                            function(err){
+                                // If there are any MySQL errors
+                                console.log(err);
+                                res.status(500).send({
+                                    'Error': 'MySQL Error',
+                                    'error_code': 'MySQL_ERR'
+                                });
+                                throw 'MySQL_ERR';
+                            }
+                        )
+                    );
+                })
+                .then(
+                    function(user_listing_own){
+                        // Here we check if the user sending the request own the listing
+                        return new Promise((resolve, reject) =>{
+                            if(user_listing_own){
+                                // If he does own his own listing
+                                // Then continue
+                                resolve(true);
+                            }
+                            else{
+                                // If they dont own the listing
+                                const err = new Error('Listing does not belong to user');
+                                err.code = 'USER_UNAUTH_LISTING';
+                                reject(err);
+                            }
+                        })
+                        .catch(
+                            function(err){
+                                console.log(err);
+                                res.status(401).send({
+                                    'Error': 'You cannot edit this listing',
+                                    'error_code': 'USER_UNAUTH_LISTING'
+                                });
+                                throw err.code;
+                            }
+                        );
+                    }
+                )
+                .then(
+                    function(){
+                        // If you can edit the listing
+                        return dataAccess.listing.editUserListing(req.params.listing_id, req.body.title, req.body.description, req.body.price)
+                        .catch(
+                            function(err){
+                                console.log(err);
+                                res.status(500).send({
+                                    'Error': 'MySQL Error',
+                                    'error_code': 'MySQL_ERR'
+                                });
+                                throw 'MySQL_ERR';
+                            }
+                        );
+                    }
+                )
+                .then(
+                    function(){
+                        // if update is successful
+                        res.status(200).send({
+                            'Result': 'Update successful'
+                        });
+                    }
+                )
+                .catch(
+                    function(err){
+                        console.log('Final catch err: ' + err);
+                    }
                 );
-            })
-            .then(
-                function(user_listing_own){
-                    // Here we check if the user sending the request own the listing
-                    return new Promise((resolve, reject) =>{
-                        if(user_listing_own){
-                            // If he does own his own listing
-                            // Then continue
-                            resolve(true);
-                        }
-                        else{
-                            // If they dont own the listing
-                            const err = new Error('Listing does not belong to user');
-                            err.code = 'USER_UNAUTH_LISTING';
-                            reject(err);
-                        }
-                    })
-                    .catch(
-                        function(err){
-                            console.log(err);
-                            res.status(401).send({
-                                'Error': 'You cannot edit this listing',
-                                'error_code': 'USER_UNAUTH_LISTING'
-                            });
-                            throw err.code;
-                        }
-                    );
-                }
-            )
-            .then(
-                function(){
-                    // If you can edit the listing
-                    return dataAccess.listing.editUserListing(req.params.listing_id, req.body.title, req.body.description, req.body.price)
-                    .catch(
-                        function(err){
-                            console.log(err);
-                            res.status(500).send({
-                                'Error': 'MySQL Error',
-                                'error_code': 'MySQL_ERR'
-                            });
-                            throw 'MySQL_ERR';
-                        }
-                    );
-                }
-            )
-            .then(
-                function(){
-                    // if update is successful
-                    res.status(200).send({
-                        'Result': 'Update successful'
-                    });
-                }
-            )
-            .catch(
-                function(err){
-                    console.log('Final catch err: ' + err);
-                }
-            );
+            }
+
         });
         // Deleting a listing
         app.delete('/api/listing/:listing_id', function(req, res){
@@ -364,80 +382,89 @@ const listingAPIController = {
                     }
                 }
                 else{
-                    // If there is no error in uploading the file
-                    // Try to add the picture
-                    new Promise((resolve) => {
-                        resolve(
-                            dataAccess.listing.checkIfUserListing(req.params.listing_id, req.user.user_id)
-                            .catch(
-                                function(err){
-                                    // If there was any MySQL errors
-                                    console.log(err);
-                                    res.status(500).send({
-                                        'Error': 'MySQL error',
-                                        'error_code': 'MySQL_ERR'
-                                    });
-                                    throw 'MYSQL_ERR';
-                                }
-                            )
-                       );
-                    })
-                    .then(
-                        function(user_listing_own){
-                            return new Promise((resolve, reject) => {
-                                if(user_listing_own){
-                                    resolve(true);
-                                }
-                                else{
-                                    // If they dont own the listing
-                                    const err = new Error('Listing does not belong to user');
-                                    err.code = 'USER_UNAUTH_LISTING';
-                                    reject(err);
-                                }
-                            })
-                            .catch(
-                                function(err){
-                                    console.log(err);
-                                    res.status(401).send({
-                                        'Error': 'You cannot add a picture to this listing',
-                                        'error_code': 'USER_UNAUTH_LISTING'
-                                    });
-                                    throw err.code;
-                                }
+                    if(req.file === undefined){
+                        // Check if file was not empty
+                        res.status(500).send({
+                            'Error': 'File is empty'
+                        });
+                        return;
+                    }
+                    else{
+                        // If there is no error in uploading the file
+                        // Try to add the picture
+                        new Promise((resolve) => {
+                            resolve(
+                                dataAccess.listing.checkIfUserListing(req.params.listing_id, req.user.user_id)
+                                .catch(
+                                    function(err){
+                                        // If there was any MySQL errors
+                                        console.log(err);
+                                        res.status(500).send({
+                                            'Error': 'MySQL error',
+                                            'error_code': 'MySQL_ERR'
+                                        });
+                                        throw 'MYSQL_ERR';
+                                    }
+                                )
                             );
-                        }
-                    )
-                    .then(
-                        function(){
-                            // If the user owns the listing
-                            return dataAccess.listing.addPictureToListing(req.params.listing_id, req.file.filename)
-                            .catch(
-                                function(err){
-                                    // If there was any MySQL errors
-                                    console.log(err);
-                                    res.status(500).send({
-                                        'Error': 'MySQL error',
-                                        'error_code': 'MySQL_ERR'
-                                    });
-                                    throw 'MYSQL_ERR';
-                                }
-                            );
-                        }
-                    )
-                    .then(
-                        function(){
-                            // If creating a user is successful
-                            res.status(201).send({
-                                'Result': 'Picture successfully added'
-                            });
-                        }
-                    )
-                    .catch(
-                        function(err){
-                            // Final catch for all errors
-                            console.log('Final catch err: ' + err);
-                        }
-                    );
+                        })
+                        .then(
+                            function(user_listing_own){
+                                return new Promise((resolve, reject) => {
+                                    if(user_listing_own){
+                                        resolve(true);
+                                    }
+                                    else{
+                                        // If they dont own the listing
+                                        const err = new Error('Listing does not belong to user');
+                                        err.code = 'USER_UNAUTH_LISTING';
+                                        reject(err);
+                                    }
+                                })
+                                .catch(
+                                    function(err){
+                                        console.log(err);
+                                        res.status(401).send({
+                                            'Error': 'You cannot add a picture to this listing',
+                                            'error_code': 'USER_UNAUTH_LISTING'
+                                        });
+                                        throw err.code;
+                                    }
+                                );
+                            }
+                        )
+                        .then(
+                            function(){
+                                // If the user owns the listing
+                                return dataAccess.listing.addPictureToListing(req.params.listing_id, req.file.filename)
+                                .catch(
+                                    function(err){
+                                        // If there was any MySQL errors
+                                        console.log(err);
+                                        res.status(500).send({
+                                            'Error': 'MySQL error',
+                                            'error_code': 'MySQL_ERR'
+                                        });
+                                        throw 'MYSQL_ERR';
+                                    }
+                                );
+                            }
+                        )
+                        .then(
+                            function(){
+                                // If creating a user is successful
+                                res.status(201).send({
+                                    'Result': 'Picture successfully added'
+                                });
+                            }
+                        )
+                        .catch(
+                            function(err){
+                                // Final catch for all errors
+                                console.log('Final catch err: ' + err);
+                            }
+                        );
+                    }
                 }
             });
         });
