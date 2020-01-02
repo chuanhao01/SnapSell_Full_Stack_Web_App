@@ -4,6 +4,7 @@
 ```bash
 # First we clone the repo from github
 git clone https://github.com/chuanhao01/Full_Stack_Web_App.git
+# In this case, we would already have the base files and folder
 # Then we need to cd into the project and install the required node modules
 cd Full_Stack_Web_App
 npm i
@@ -23,6 +24,17 @@ mkdir avatarIcons
 mkdir listingPictures
 # cd into the main directory
 cd ..
+```  
+
+Now we need to set up the enviroment variables to store sensitive information.  
+
+This can be done through the sample startup file, `startup.sm.sample`. In it you will see,
+```bash
+# Change the strings for your own setup
+export MysqlUser='Your MySQL username GOES HERE';
+export MysqlPassword='Your MySQL password GOES HERE';
+export JWT_SECRET='Your JWT SECRET GOES HERE';
+export COOKIE_SECRET='Your COOKIE SECRET GOES HERE';
 ```
 
 ## 3. Running the server
