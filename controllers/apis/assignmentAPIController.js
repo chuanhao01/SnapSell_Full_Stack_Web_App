@@ -138,8 +138,8 @@ const assignmentAPIController= {
                         function(err){
                             if(err){
                                 res.status(500).send({
-                                        'Condition': 'Unknown error',
-                                        'Code': '500 Internal Server Error'
+                                    'Condition': 'Unknown error',
+                                    'Code': '500 Internal Server Error'
                                 });
                             }
                             throw 'GETUSERSID_DB_ERR';

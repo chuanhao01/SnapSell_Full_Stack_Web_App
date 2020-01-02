@@ -244,7 +244,7 @@ const listingsDB = {
         return new Promise((resolve, reject) => {
             this.pool.query(`
             SELECT * FROM LISTING_PICTURES
-            WHERE ((listing_id = ?) AND deleted = 0) 
+            WHERE ((listing_id = ?) AND (deleted = 0)) 
             `, [listing_id], function(err, data){
                 if(err){
                     reject(err);
