@@ -435,6 +435,47 @@ const listingAPIController = {
                         )
                         .then(
                             function(){
+                                // Check if the listing exists
+                                return dataAccess.listing.getListingById(req.params.listing_id)
+                                .catch(
+                                    function(err){
+                                        console.log(err);
+                                        res.status(500).send({
+                                            'Error': 'MySQL error',
+                                            'error_code': 'MySQL_ERR'
+                                        });
+                                        throw 'MySQL_ERR';
+                                    }
+                                );
+                            }
+                        )
+                        .then(
+                            function(listing){
+                                return new Promise((resolve, reject) => {
+                                    if(listing.length === 1){
+                                        // Listing exists
+                                        resolve(true);
+                                    }
+                                    else{
+                                        const err = new Error('Listing does not exists');
+                                        err.code = 'LISTING_EXISTS';
+                                        reject(err);
+                                    }
+                                })
+                                .catch(
+                                    function(err){
+                                        console.log(err);
+                                        res.status(404).send({
+                                            'Error': 'Listing does not exists',
+                                            'error_code': err.code  
+                                        });
+                                        throw err.code;
+                                    }
+                                );
+                            }
+                        )
+                        .then(
+                            function(){
                                 // If the user owns the listing
                                 return dataAccess.listing.addPictureToListing(req.params.listing_id, req.file.filename)
                                 .catch(
