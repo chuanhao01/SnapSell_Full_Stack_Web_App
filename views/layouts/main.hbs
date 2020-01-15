@@ -20,35 +20,72 @@
     
     <title>{{title}}</title>
 </head>
-<body class="bg-dark text-white">
-
+<body class="light">
     <main id="app">
-        <b-navbar type='dark' class="bg-secondary">
-            <b-navbar-brand href='/user/home'>SnapSell</b-navbar-brand>
-            <b-nav-text
-            class="text-white">
-                Welcome {{user.username}}
-            </b-nav-text>
+        <b-navbar class="border-bottom border-secondary">
             {{#if user}}
-            <b-navbar-nav class="ml-auto">
-                <b-nav-item-dropdown text="Profile">
-                    <b-dropdown-item href="/user/profile">View your profile</b-dropdown-item>
-                    <b-dropdown-item href="/user/profile/edit">Edit your profile</b-dropdown-item>
-                </b-nav-item-dropdown>                
-                <b-nav-item-dropdown text="Listings">
-                    <b-dropdown-item href="/user/listing/add">Add a listing</b-dropdown-item>
-                    <b-dropdown-item href="/user/listing">View your Listings</b-dropdown-item>
-                    <b-dropdown-item href="/listing">View other listings</b-dropdown-item>
-                </b-nav-item-dropdown>                
-                <b-button class="btn btn-danger ml-2" id="logoutBtn" href='/logout'>
-                    Logout
-                </b-button>
-            </b-navbar-nav>
+                {{!-- If the user is logged in  --}}
+                <b-navbar-nav>
+                    {{!-- Left side --}}
+                    <b-navbar-brand href='/user/home'>SnapSell</b-navbar-brand>
+                    <b-nav-text>
+                        Welcome {{user.username}}
+                    </b-nav-text>
+                </b-navbar-nav>
+                <b-navbar-nav class="ml-auto">
+                    {{!-- Right side --}}
+                    <b-nav-form class="mr-3">
+                        <b-input-group>
+                            <template v-slot:prepend>
+                                <b-dropdown text="Listings" variant="secondary" id="searchDrop">
+                                    <b-dropdown-item-button id='searchListing'>Listings</b-dropdown-item-button>
+                                    <b-dropdown-item-button id="searchUser">Users</b-dropdown-item-button>
+                                </b-dropdown>
+                            </template>
+                            <b-form-input placeholder="Search"></b-form-input>
+                            <template v-slot:append>
+                                <b-button id="searchSubmit">Search</b-button>
+                            </template>
+                        </b-input-group>
+                    </b-nav-form>
+                    <b-nav-item-dropdown text="Profile">
+                        <b-dropdown-item href="/user/profile">View your profile</b-dropdown-item>
+                        <b-dropdown-item href="/user/profile/edit">Edit your profile</b-dropdown-item>
+                    </b-nav-item-dropdown>                
+                    <b-nav-item-dropdown text="Listings">
+                        <b-dropdown-item href="/user/listing/add">Add a listing</b-dropdown-item>
+                        <b-dropdown-item href="/user/listing">View your Listings</b-dropdown-item>
+                        <b-dropdown-item href="/listing">View other listings</b-dropdown-item>
+                    </b-nav-item-dropdown>                
+                    <b-button class="btn btn-danger ml-2" id="logoutBtn" href='/logout'>
+                        Logout
+                    </b-button>
+                    </b-navbar-nav>
             {{else}}
-            <b-navbar-nav class="ml-auto">
-                <b-nav-item href="/login">Login</b-nav-item>
-                <b-nav-item href="/account/create">Create an account</b-nav-item>
-            </b-navbar-nav>
+                {{!-- If the user is not logged in --}}
+                <b-navbar-nav>
+                    {{!-- Left side --}}
+                    <b-navbar-brand href='/user/home'>SnapSell</b-navbar-brand>
+                </b-navbar-nav>
+                <b-navbar-nav class="ml-auto">
+                    {{!-- Right side --}}
+                    <b-nav-form class="mr-3">
+                        <b-input-group>
+                            <template v-slot:prepend>
+                                <b-dropdown text="Listings" variant="secondary" id="searchDrop">
+                                    <b-dropdown-item-button id='searchListing'>Listings</b-dropdown-item-button>
+                                    <b-dropdown-item-button id="searchUser">Users</b-dropdown-item-button>
+                                </b-dropdown>
+                            </template>
+                            <b-form-input placeholder="Search"></b-form-input>
+                            <template v-slot:append>
+                                <b-button id="searchSubmit">Search</b-button>
+                            </template>
+                        </b-input-group>
+                    </b-nav-form>
+                    <b-nav-item href="/login">Login</b-nav-item>
+                    <b-nav-item href="/account/create">Create an account</b-nav-item>
+                </b-navbar-nav>
             {{/if}}
         </b-navbar>
 
@@ -69,6 +106,28 @@
     </script>
 
     {{{_sections.scripts}}}
+    <script>
+        // Adding custom js for dropdown toggle select
+        function setSearch(){
+            // Setting up the dropdown swapping
+            const dropdown = document.getElementById("searchDrop__BV_toggle_");
+            document.getElementById('searchListing').addEventListener("click", function(){
+                dropdown.innerHTML = 'Listings'
+            });
+            document.getElementById('searchUser').addEventListener("click", function(){
+                dropdown.innerHTML = 'Users'
+            });
+            // Setting up the submit button
+            document.getElementById('searchSubmit').addEventListener("click", searchSubmit);
+        }
+        // Utility function for searching
+        function searchSubmit(){
+            const dropdown = document.getElementById("searchDrop__BV_toggle_");
+            const searchInput = document.getElementById('__BVID__7');
+            window.location.href = `/search?type=${dropdown.innerHTML}&search=${searchInput.value}`;
+        }
+        setSearch();
+    </script>
 </body>
 
 </html>
