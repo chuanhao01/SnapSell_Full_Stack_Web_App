@@ -36,6 +36,7 @@ const userAPIController = {
             res.status(200).send({
                 'user': {
                     'username': req.user.username,
+                    'created_timestamp': req.user.created_timestamp
                 }
             });
         });
