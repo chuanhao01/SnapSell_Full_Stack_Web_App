@@ -5,7 +5,7 @@
             v-if='listing'>
                 <b-card
                 :title='listing.title'
-                :bg-variant='listing.availability ? "primary" : "success"'>
+                :bg-variant='listing.availability ? "primary" : "light"'>
                     <b-card-text>
                         <span class="d-block font-weight-bold">Description</span>
                         <p>
@@ -99,7 +99,7 @@
             v-if='offers.length'>
                 <b-card
                 v-for='offer in offers'
-                :bg-variant='offer.status ? "warning" : "primary"'
+                :bg-variant='offer.status ? "warning" : "light"'
                 >
                     <b-card-text>
                         <article class="d-block">

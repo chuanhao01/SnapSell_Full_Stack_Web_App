@@ -1,63 +1,8 @@
 <main class="container-fluid mt-3">
     <div class="row">
-        <div class="col-12">
-            <template
-            v-if='listing'>
-                <b-card
-                :title='listing.title'
-                :bg-variant='listing.availability ? "primary" : "success"'>
-                    <b-card-text>
-                        <span class="d-block font-weight-bold">Description</span>
-                        <p>
-                            \{{listing.description}}
-                        </p>
-                    </b-card-text>
-                    <b-card-text>
-                        <article class="d-block">
-                            <span class="font-weight-bold">Price: </span>
-                            <span>
-                                \{{listing.price}}
-                            </span>
-                        </article>
-                        <article class="d-block">
-                            <span class="font-weight-bold">By: </span>
-                            <span>
-                                \{{listing.listing_user_username}}
-                            </span>
-                        </article>
-                        <article>
-                            <span>
-                                Likes: \{{listing.num_likes}} 
-                            </span>
-                            <template
-                            v-if='like_before'>
-                                <b-button variant='danger' @click=unlikeListing>Unlike the listing</b-button>
-                            </template>
-                            <template
-                            v-else>
-                                <b-button variant='primary' @click=likeListing>Like the listing</b-button>
-                            </template>
-                        </article>
-                    </b-card-text>
-                    <b-card-text>
-                        <template
-                        v-if='offer_placed'>
-                            <b-button variant="warning" :href='`/listing/offer/edit/${listing.listing_id}`'>Edit your offering</b-button>
-                            <b-button variant='danger' @click='deleteOffer'>Delete your offer</b-button>
-                        </template>
-                        <template
-                        v-else>
-                            <b-button variant="primary" :href='`/listing/offer/${listing.listing_id}`'>Place an offering</b-button>
-                        </template>
-                    </b-card-text>
-                </b-card>
-            </template>
-        </div>
-        <div 
-        class="col-12 text-center"
-        >
-            <template
-            v-if='listing'>
+        <template
+        v-if='listing'>
+            <div class="col-6">
                 <b-card
                 :title='`Showing pictures of ${listing.title}`'
                 bg-variant='info'
@@ -101,43 +46,109 @@
                         </template>
                     </b-card-body>
                 </b-card>
-            </template>
-        </div>
-        <div class="col-12 mt-3">
-            <article class="d-block">
-                <h3 class="d-block text-center">
-                    Offers for this listing
-                </h3>
-            </article>
-            <template
-            v-if='offers.length'>
+            </div>
+            <div class="col-6">
                 <b-card
-                v-for='offer in offers'
-                :bg-variant='offer.status ? "warning" : "primary"'
-                >
+                bg-variant='light'>
+                    <b-card-text class="row">
+                        <div class="col-12">
+                            <div style="width: 75px; height: 75px">
+                                <b-img rounded='circle' thumbnail fluid src='/api/user/avatar_icon'></b-img>
+                            </div>
+                            <article>
+                                <p>\{{listing.listing_user_username}}</p>
+                            </article>
+                        </div>
+                    </b-card-text>
+                    <b-card-text class="row">
+                        <div class="col-6">
+                            <h2>
+                            S$\{{listing.price}}
+                            </h2>
+                        </div>
+                        <div class="col-6">
+                            <div class="float-right">
+                                <template v-if='like_before'>
+                                     <span>
+                                        <b-button variant='light' @click='unlikeListing'>
+                                            <b-img src="https://img.icons8.com/plasticine/100/000000/like.png" style="height: 50px; width: 50px;">
+                                        </b-button>
+                                    </span>                                   
+                                </template>
+                                <template v-else>
+                                    <span>
+                                        <b-button variant='light' @click='likeListing'>
+                                            <b-img src="https://img.icons8.com/plasticine/100/000000/like--v2.png" style="height: 50px; width: 50px;">
+                                        </b-button>
+                                    </span>
+                                </template>
+                                <span>\{{listing.num_likes}}</span>
+                            </div>
+                        </div>
+                    </b-card-text>
                     <b-card-text>
-                        <article class="d-block">
-                            <span class="font-weight-bold">Offer price: </span>
-                            <span>
-                                \{{offer.offer_price}}
-                            </span>
+                        <article>
+                            <h3>\{{listing.title}}</h3>
                         </article>
-                        <article class="d-block">
-                            <span class="font-weight-bold">By: </span>
-                            <span>
-                                \{{offer.offer_user_username}}
-                            </span>
+                        <article>
+                            <p>\{{listing.description}}</p>
+                        </article>
+                        <article>
+                            Made \{{listing.created_timestamp.fromNow()}}
                         </article>
                     </b-card-text>
+                    <template v-if='offer_placed'>
+                        {{!-- If user has placed an offer --}}
+                        <b-card-text>
+                            <b-button variant="warning" :href='`/listing/offer/edit/${listing.listing_id}`'>Edit your offering</b-button>
+                            <b-button variant='danger' @click='deleteOffer'>Delete your offer</b-button>
+                        </b-card-text>
+                    </template>
+                    <template v-else>
+                        {{!-- user has not placed an offer --}}
+                        <b-card-text>
+                            <b-button variant="primary" :href='`/listing/offer/${listing.listing_id}`'>Place an offering</b-button>
+                        </b-card-text>
+                    </template>
+                    <template v-if='offers'>
+                        {{!-- If there are offer made --}}
+                        <b-card-text>
+                            <article class="text-center">
+                                <h3>Offers made on this listing</h3>
+                            </article>
+                        </b-card-text>
+                        <b-card-text>
+                            <b-card
+                            v-for='offer in offers'
+                            :bg-variant='offer.status ? "warning" : "primary"'
+                            text-variant='white'
+                            >
+                                <b-card-text>
+                                    <article class="d-block">
+                                        <span class="font-weight-bold">Offer price: </span>
+                                        <span>
+                                            \{{offer.offer_price}}
+                                        </span>
+                                    </article>
+                                    <article class="d-block">
+                                        <span class="font-weight-bold">By: </span>
+                                        <span>
+                                            \{{offer.offer_user_username}}
+                                        </span>
+                                    </article>
+                                    <article>
+                                        <span>Made on: \{{offer.last_modified_timestamp.fromNow()}}</span>
+                                    </article>
+                                </b-card-text>
+                            </b-card>
+                        </b-card-text>
+                    </template>
+                    <template v-else>
+                        {{!-- If there are no offers made --}}
+                    </template>
                 </b-card>
-            </template>
-            <template
-            v-else>
-                <article class="text-center">
-                    <h4>There are no offers for this listing</h4>
-                </article>
-            </template>
-        </div>
+            </div>
+        </template>
     </div>    
 </main>
 
@@ -164,6 +175,7 @@
                 .then(
                     function(res){
                         this.listing = res.data.listing;
+                        this.listing.created_timestamp = moment(this.listing.created_timestamp);
                     }.bind(this)
                 )
                 .catch(
@@ -180,6 +192,9 @@
                 .then(
                     function(res){
                         this.offers = res.data.offers
+                        for(let offer of this.offers){
+                            offer.last_modified_timestamp = moment(offer.last_modified_timestamp)
+                        }
                     }.bind(this)
                 )
                 .catch(
