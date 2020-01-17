@@ -137,6 +137,97 @@ const userAPIController = {
                 }
             });
         });
+        // Dealing with other user data besides own user
+        // Dealing with user basic data (text based)
+        app.get('/api/user/other/:user_id', function(req, res){
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.user.getUserByUserId(req.params.user_id)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            if(err.code === 'USER_NOT_EXIST'){
+                                res.status(500).send({
+                                    'Error': err.message,
+                                    'error_code': err.code
+                                });                               
+                                throw err.code;
+                            }
+                            else{
+                                res.status(500).send({
+                                    'Error': 'MySQL error',
+                                    'error_code': 'MYSQL_ERR'
+                                });
+                                throw 'MYSQL_ERR';
+                            }
+                        }
+                    )
+                );
+            })
+            .then(
+                function(user){
+                    // send user data back to the front
+                    res.status(200).send({
+                        'user': {
+                            'user_id': user.user_id,
+                            'username': user.username,
+                            'created_timestamp': user.created_timestamp
+                        }
+                    });
+                }.bind(this)
+            )
+            .catch(
+                function(err){
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
+        // Dealing with other user avatar image
+        app.get('/api/user/other/:user_id/avatar_icon', function(req, res){
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.user.getUserByUserId(req.params.user_id)
+                     .catch(
+                        function(err){
+                            console.log(err);
+                            if(err.code === 'USER_NOT_EXIST'){
+                                res.status(500).send({
+                                    'Error': err.message,
+                                    'error_code': err.code
+                                });                               
+                                throw err.code;
+                            }
+                            else{
+                                res.status(500).send({
+                                    'Error': 'MySQL error',
+                                    'error_code': 'MYSQL_ERR'
+                                });
+                                throw 'MYSQL_ERR';
+                            }
+                        }
+                    )
+                );                   
+            })
+            .then(
+                function(user){
+                    // If the user can be found
+                    res.sendFile(process.cwd() + avatar_icon_file_base_path + user.avatar_icon_file_name, function(err){
+                        if(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'Error retriving avatar',
+                                'error_code': 'GET_AVATAR_ERROR' 
+                            });
+                        }
+                    });
+                }
+            )
+            .catch(
+                function(err){
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
     }
 };
 
