@@ -53,7 +53,7 @@
                     <b-card-text class="row">
                         <div class="col-12">
                             <div style="width: 75px; height: 75px">
-                                <b-img rounded='circle' thumbnail fluid src='/api/user/avatar_icon'></b-img>
+                                <b-img rounded='circle' thumbnail fluid :src='`/api/user/other/${listing.listing_user_id}/avatar_icon`'></b-img>
                             </div>
                             <article>
                                 <p>\{{listing.listing_user_username}}</p>
