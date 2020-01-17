@@ -110,7 +110,7 @@
                             <b-button variant="primary" :href='`/listing/offer/${listing.listing_id}`'>Place an offering</b-button>
                         </b-card-text>
                     </template>
-                    <template v-if='offers'>
+                    <template v-if='offers.length !== 0'>
                         {{!-- If there are offer made --}}
                         <b-card-text>
                             <article class="text-center">
@@ -145,6 +145,11 @@
                     </template>
                     <template v-else>
                         {{!-- If there are no offers made --}}
+                        <b-card-text>
+                            <article>
+                                <h3>There are no offers for this listings</h3>
+                            </article>
+                        </b-card-text>
                     </template>
                 </b-card>
             </div>
