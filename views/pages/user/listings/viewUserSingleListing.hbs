@@ -1,49 +1,8 @@
 <main class="container-fluid mt-3">
     <div class="row">
-        <div class="col-12">
-            <template
-            v-if='listing'>
-                <b-card
-                :title='listing.title'
-                :bg-variant='listing.availability ? "primary" : "light"'>
-                    <b-card-text>
-                        <span class="d-block font-weight-bold">Description</span>
-                        <p>
-                            \{{listing.description}}
-                        </p>
-                    </b-card-text>
-                    <b-card-text>
-                        <article>
-                            <span class="font-weight-bold">Price: </span>
-                            <span>
-                                \{{listing.price}}
-                            </span>
-                        </article>
-                        <article>
-                            <span>Likes: \{{listing.num_likes}}</span>
-                        </article>
-                    </b-card-text>
-                    <b-card-text>
-                        <b-button variant='primary' :href='`/user/listing/picture/add/${listing.listing_id}`'>
-                            Add an image to your listing
-                        </b-button>
-                    </b-card-text>
-                    <b-card-text>
-                        <b-button variant="warning" :href='`/user/listing/edit/${listing.listing_id}`'>Edit</b-button>
-                        <b-button
-                        @click='deleteListing(listing.listing_id)'
-                        variant="danger">
-                            Delete
-                        </b-button>
-                    </b-card-text>
-                </b-card>
-            </template>
-        </div>
-        <div 
-        class="col-12 text-center"
-        >
-            <template
-            v-if='listing'>
+        <template
+        v-if='listing'>
+            <div class="col-6">
                 <b-card
                 :title='`Showing pictures of ${listing.title}`'
                 bg-variant='info'
@@ -87,45 +46,102 @@
                         </template>
                     </b-card-body>
                 </b-card>
-            </template>
-        </div>
-        <div class="col-12 mt-3">
-            <article class="d-block">
-                <h3 class="d-block text-center">
-                    Offers for this listing
-                </h3>
-            </article>
-            <template
-            v-if='offers.length'>
+            </div>
+            <div class="col-6">
                 <b-card
-                v-for='offer in offers'
-                :bg-variant='offer.status ? "warning" : "light"'
-                >
+                bg-variant='light'>
+                    <b-card-text class="row">
+                        <div class="col-12">
+                            <div style="width: 75px; height: 75px">
+                                <b-img rounded='circle' thumbnail fluid :src='`/api/user/other/${listing.listing_user_id}/avatar_icon`'></b-img>
+                            </div>
+                            <article>
+                                <p>\{{listing.listing_user_username}}</p>
+                            </article>
+                        </div>
+                    </b-card-text>
+                    <b-card-text class="row">
+                        <div class="col-6">
+                            <h2>
+                            S$\{{listing.price}}
+                            </h2>
+                        </div>
+                        <div class="col-6">
+                            <div class="float-right">
+                                <span>
+                                    <b-img src="https://img.icons8.com/plasticine/100/000000/like.png" style="height: 50px; width: 50px;">
+                                </span>
+                                <span>\{{listing.num_likes}}</span>
+                            </div>
+                        </div>
+                    </b-card-text>
                     <b-card-text>
-                        <article class="d-block">
-                            <span class="font-weight-bold">Offer price: </span>
-                            <span>
-                                \{{offer.offer_price}}
-                            </span>
+                        <article>
+                            <h3>\{{listing.title}}</h3>
                         </article>
-                        <article class="d-block">
-                            <span class="font-weight-bold">By: </span>
-                            <span>
-                                \{{offer.offer_user_username}}
-                            </span>
+                        <article>
+                            <p>\{{listing.description}}</p>
+                        </article>
+                        <article>
+                            Made \{{listing.created_timestamp.fromNow()}}
                         </article>
                     </b-card-text>
+                    {{!-- Actions only the user can do --}}
+                    <b-card-text>
+                        <b-button variant='primary' :href='`/user/listing/picture/add/${listing.listing_id}`'>
+                            Add an image to your listing
+                        </b-button>
+                    </b-card-text>
+                    <b-card-text>
+                        <b-button variant="warning" :href='`/user/listing/edit/${listing.listing_id}`'>Edit</b-button>
+                        <b-button
+                        @click='deleteListing(listing.listing_id)'
+                        variant="danger">
+                            Delete
+                        </b-button>
+                    </b-card-text>
+                    <template v-if='offers'>
+                        {{!-- If there are offer made --}}
+                        <b-card-text>
+                            <article class="text-center">
+                                <h3>Offers made on this listing</h3>
+                            </article>
+                        </b-card-text>
+                        <b-card-text>
+                            <b-card
+                            v-for='offer in offers'
+                            :bg-variant='offer.status ? "warning" : "primary"'
+                            text-variant='white'
+                            >
+                                <b-card-text>
+                                    <article class="d-block">
+                                        <span class="font-weight-bold">Offer price: </span>
+                                        <span>
+                                            \{{offer.offer_price}}
+                                        </span>
+                                    </article>
+                                    <article class="d-block">
+                                        <span class="font-weight-bold">By: </span>
+                                        <span>
+                                            \{{offer.offer_user_username}}
+                                        </span>
+                                    </article>
+                                    <article>
+                                        <span>Made \{{offer.last_modified_timestamp.fromNow()}}</span>
+                                    </article>
+                                </b-card-text>
+                            </b-card>
+                        </b-card-text>
+                    </template>
+                    <template v-else>
+                        {{!-- If there are no offers made --}}
+                    </template>
                 </b-card>
-            </template>
-            <template
-            v-else>
-                <article class="text-center">
-                    <h4>There are no offers for this listing</h4>
-                </article>
-            </template>
-        </div>
+            </div>
+        </template>
     </div>    
 </main>
+
 
 {{#section 'scripts'}}
 <script>
@@ -148,6 +164,7 @@
                 .then(
                     function(res){
                         this.listing = res.data.listing;
+                        this.listing.created_timestamp = moment(this.listing.created_timestamp);
                     }.bind(this)
                 )
                 .catch(
@@ -202,6 +219,9 @@
                 .then(
                     function(res){
                         this.offers = res.data.offers
+                        for(let offer of this.offers){
+                            offer.last_modified_timestamp = moment(offer.last_modified_timestamp)
+                        }
                     }.bind(this)
                 )
                 .catch(
