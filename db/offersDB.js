@@ -79,6 +79,23 @@ const offersDB = {
             });
         });
     },
+    // Edits the offer of a user
+    editUserOffer(listing_id, offer_user_id, offer_price){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            UPDATE OFFERS
+            SET offer_price = ?
+            WHERE ((listing_id = ?) AND (offer_user_id = ?) AND (deleted = 0)) 
+            `, [offer_price, listing_id, offer_user_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
+    },
     // Delete the offer made by a user
     deleteUserOffer(listing_id, offer_user_id){
         return new Promise((resolve, reject) => {

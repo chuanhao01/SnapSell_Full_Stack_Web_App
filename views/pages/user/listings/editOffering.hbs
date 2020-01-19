@@ -116,7 +116,7 @@
                         </article>
                     </b-card-text>
                     <template v-if='offer'>
-                        {{!-- If th user has already made a listing --}}
+                        {{!-- If th user has already made a offer--}}
                         <b-card-text>
                             <article>
                                 <h3>Your current offer is:</h3>
@@ -131,12 +131,6 @@
                                         <span class="font-weight-bold">Offer price: </span>
                                         <span>
                                             \{{offer.offer_price}}
-                                        </span>
-                                    </article>
-                                    <article class="d-block">
-                                        <span class="font-weight-bold">By: </span>
-                                        <span>
-                                            \{{offer.offer_user_username}}
                                         </span>
                                     </article>
                                     <article>
@@ -230,6 +224,7 @@
                 .then(
                     function(res){
                         console.log(res);
+                        window.location.href = `/listing/${listing_id}`
                     }
                 )
                 .catch(
