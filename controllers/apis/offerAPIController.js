@@ -163,6 +163,38 @@ const offerAPIController = {
                 );
             }
         });
+        app.put('/api/offer/:listing_id', function(req, res){
+            new Promise((resolve) => {
+                resolve(
+                    // Editing the offer 
+                    dataAccess.offer.editUserOffer(req.params.listing_id, req.user.user_id, req.body.offer_price)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL_ERR',
+                                'error_code': 'MySQL_ERR'
+                            });
+                            throw 'MySQL_ERR';
+                        }
+                    )
+                );
+            })
+            .then(
+                function(){
+                    // If the offer was edited/updated
+                    res.status(200).send({
+                        'Result': 'Update successful'
+                    });
+                }
+            )
+            .catch(
+                function(err){
+                    // Final catch for all errors
+                    console.log('Final catch err: ' + err);
+                }
+            );
+        });
         // Delete a user's offer on a listing
         app.delete('/api/offer/:listing_id', function(req, res){
             new Promise((resolve) => {
@@ -190,7 +222,6 @@ const offerAPIController = {
             )
             .catch(
                 function(err){
-
                     // Final catch for all errors
                     console.log('Final catch err: ' + err);
                 }

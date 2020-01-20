@@ -28,38 +28,96 @@
                 <b-button type="reset" variant="danger">Reset</b-button>
             </b-form>
         </div>
-        <div class="col-12">
-            <article class="d-block">
-                <h3 class="d-block text-center">
-                    The listing
-                </h2>
-            </article>
+        {{!-- Showing the listing below --}}
+        <div class="col-12 row mt-5">
             <template
             v-if='listing'>
-                <b-card
-                :title='listing.title'
-                :bg-variant='listing.availability ? "primary" : "success"'>
-                    <b-card-text>
-                        <span class="d-block font-weight-bold">Description</span>
-                        <p>
-                            \{{listing.description}}
-                        </p>
-                    </b-card-text>
-                    <b-card-text>
-                        <article class="d-block">
-                            <span class="font-weight-bold">Price: </span>
-                            <span>
-                                \{{listing.price}}
-                            </span>
-                        </article>
-                        <article class="d-block">
-                            <span class="font-weight-bold">By: </span>
-                            <span>
-                                \{{listing.listing_user_username}}
-                            </span>
-                        </article>
-                    </b-card-text>
-                </b-card>
+                <div class="col-6">
+                    <b-card
+                    :title='`Showing pictures of ${listing.title}`'
+                    bg-variant='info'
+                    class="d-flex align-items-center"
+                    >
+                        <b-card-body
+                        style='width: 600px; height: 100%;'
+                        >
+                            <template
+                            v-if='listing_pictures.length'>
+                                <b-carousel
+                                id="carousel-1"
+                                v-model="slide"
+                                :interval="4000"
+                                no-animation
+                                controls
+                                indicators
+                                background="#ababab"
+                                img-width="600"
+                                img-height="480"
+                                style="text-shadow: 1px 1px 2px #333;"
+                                @sliding-start="onSlideStart"
+                                @sliding-end="onSlideEnd"
+                                >
+                                    <!-- Text slides with image -->
+                                    <b-carousel-slide
+                                    v-for='listing_picture of listing_pictures'
+                                    :img-src='`/api/listing/picture/${listing_picture.listing_picture_file_name}`'
+                                    >
+                                    </b-carousel-slide>
+                                </b-carousel>
+                                <p class="mt-4">
+                                Picture #: \{{ slide + 1 }}
+                                </p>
+                            </template>
+                            <template
+                            v-else>
+                                <article>
+                                    <h4>This listing has no pictures</h4>
+                                </article>
+                            </template>
+                        </b-card-body>
+                    </b-card>
+                </div>
+                <div class="col-6">
+                    <b-card
+                    bg-variant='light'>
+                        <b-card-text class="row">
+                            <div class="col-12">
+                                <div style="width: 75px; height: 75px">
+                                    <b-img rounded='circle' thumbnail fluid :src='`/api/user/other/${listing.listing_user_id}/avatar_icon`'></b-img>
+                                </div>
+                                <article>
+                                    <p>\{{listing.listing_user_username}}</p>
+                                </article>
+                            </div>
+                        </b-card-text>
+                        <b-card-text class="row">
+                            <div class="col-6">
+                                <h2>
+                                S$\{{listing.price}}
+                                </h2>
+                            </div>
+                            <div class="col-6">
+                                <div class="float-right">
+                                    <span>
+                                        <b-img src="https://img.icons8.com/plasticine/100/000000/like--v2.png" style="height: 50px; width: 50px;">
+                                    </span>
+                                    <span>\{{listing.num_likes}}</span>
+                                </div>
+                            </div>
+                        </b-card-text>
+                        <b-card-text>
+                            <article>
+                                <h3>\{{listing.title}}</h3>
+                            </article>
+                            <article>
+                                <p>\{{listing.description}}</p>
+                            </article>
+                            <article>
+                                Made \{{listing.created_timestamp.fromNow()}}
+                            </article>
+                        </b-card-text>
+                    </b-card>
+                </div>
             </template>
         </div>
     </div>
@@ -74,7 +132,12 @@
                 offer_price: null,
             },
             showForm: true,
+            // Listing
             listing: null,
+            // For listing pictures
+            listing_pictures: [],
+            slide: 0,
+            sliding: null,
         },
         methods:{
             onReset(event){
@@ -103,24 +166,51 @@
                     }
                 );
             },
+            // Loading methods are down here
             getListing(){
                 const listing_id = window.location.pathname.split("/").pop();
-                axios
-                .get(`/api/listing/${listing_id}`)
+                return axios.get(`/api/listing/${listing_id}`)
                 .then(
                     function(res){
                         this.listing = res.data.listing;
+                        this.listing.created_timestamp = moment(this.listing.created_timestamp);
                     }.bind(this)
                 )
                 .catch(
                     function(err){
                         console.log(err.response);
+                        throw 'GET_ERR';
                     }
                 )
+            },
+            // Get the pictures for the listing
+            getListingPictures(){
+                const listing_id = window.location.pathname.split("/").pop();
+                axios
+                .get(`/api/listing/pictures/${listing_id}`)
+                .then(
+                    function(res){
+                        console.log(res);
+                        this.listing_pictures = res.data.listing_pictures;
+                    }.bind(this)
+                )
+                .catch(
+                    function(err){
+                        console.log(err);
+                    }
+                )
+            },
+            // Methods for carousel
+            onSlideStart(slide) {
+                this.sliding = true
+            },
+            onSlideEnd(slide) {
+                this.sliding = false
             }
         },
         created(){
             this.getListing();
+            this.getListingPictures();
         }
     });
 </script>

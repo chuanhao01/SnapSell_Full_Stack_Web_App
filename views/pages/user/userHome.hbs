@@ -1,33 +1,50 @@
 <main class="container-fluid mt-3">
     <div class="row">
-        <div class="col-12">
-            <article class="d-block w-100">
-                <h2 class="d-block text-center">
-                    Welcome to your user dashboard
-                </h2>
-            </article>
-        </div>
-        <div class="col-6">
-            <b-card title="Your profile" bg-variant="primary" text-variant="white">
-                <b-button href="/user/profile" class="card-link btn btn-info">
-                    View your profile 
-                </b-button>
-                <b-button href="/user/profile/edit" class="card-link btn btn-warning">
-                    Edit your profile
-                </b-button>
+        <div class="col-2">
+            <b-card>
+                <template v-if='user'>
+                    <b-card-text style="width: 200px; height: 200px;" class="mx-auto">
+                        {{!-- Fixing height here so avatar looks the same --}}
+                        <b-img rounded='circle' thumbnail fulid src='/api/user/avatar_icon'></b-img>
+                    </b-card-text>
+                    <b-card-text>
+                        <article>
+                            <h2>\{{user.username}}</h2>
+                        </article>
+                        <article>
+                            <p>Joined in: \{{user.created_timestamp.format('LL')}}</p>
+                        </article>
+                    </b-card-text>
+                </template>
             </b-card>
         </div>
-        <div class="col-6">
-            <b-card title="Your listings" bg-variant="secondary" text-variant="white">
-                <b-button href="/user/listing/add" class="card-link btn btn-success">
-                    Add a listing
-                </b-button>
-                <b-button href="/user/listing" class="card-link btn btn-info">
-                    View your listings 
-                </b-button>
-                <b-button href="/listing" class="card-link btn btn-warning">
-                    View other listings
-                </b-button>
+        <div class="col-10">
+            <b-card bg-variant='secondary' title='Welcome to your Snapsell dashboard' class="text-white">
+                <div class="row">
+                    <div class="col-6">
+                        <b-card title="Your profile" bg-variant="primary" text-variant="white">
+                            <b-button href="/user/profile" class="card-link btn btn-info">
+                                View your profile 
+                            </b-button>
+                            <b-button href="/user/profile/edit" class="card-link btn btn-warning">
+                                Edit your profile
+                            </b-button>
+                        </b-card>                       
+                    </div>
+                    <div class="col-6">
+                        <b-card title="Your listings" bg-variant="primary" text-variant="white">
+                            <b-button href="/user/listing/add" class="card-link btn btn-success">
+                                Add a listing
+                            </b-button>
+                            <b-button href="/user/listing" class="card-link btn btn-info">
+                                View your listings 
+                            </b-button>
+                            <b-button href="/listing" class="card-link btn btn-warning">
+                                View other listings
+                            </b-button>
+                        </b-card>
+                    </div>
+                </div>
             </b-card>
         </div>
     </div>
@@ -37,6 +54,29 @@
 <script>
     const app = new Vue({
         el: '#app',
+        data: {
+            user: null,
+        },
+        methods: {
+            getUser(){
+                axios
+                .get('/api/user')
+                .then(
+                    function(res){
+                        this.user = res.data.user;
+                        this.user.created_timestamp = moment(this.user.created_timestamp)
+                    }.bind(this)
+                )
+                .catch(
+                    function(err){
+                        console.log(err);
+                    }
+                )
+            },
+        },
+        created(){
+            this.getUser();
+        },
     });
 </script>
 {{/section}}
