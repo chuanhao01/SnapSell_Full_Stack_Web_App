@@ -116,7 +116,7 @@
             onSubmit(event){
                 event.preventDefault();
                 axios
-                .post('/api/search/', this.form)
+                .post('/api/search', this.form)
                 .then(
                     function(res){
                         console.log(res);

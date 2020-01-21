@@ -254,6 +254,25 @@ const listingsDB = {
                 }
             });
         });
+    },
+    // Dealing with searching for listings
+    searchWithoutUser(search_query){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT * FROM LISTINGS
+            WHERE ((deleted = ?) AND (title REGEXP ?))  
+            `, [search_query], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
+    },
+    searchWithUser(search_query, user){
+        return;
     }
 };
 

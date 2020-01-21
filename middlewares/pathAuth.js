@@ -3,12 +3,16 @@
 
 const whitelisted_paths = [
     '/',
+    // Account and login
     '/login',
     '/account/create',
     '/api/account',
     '/api/login',
     '/api/refresh_token',
     '/error/403',
+    // Searching
+    '/search',
+    '/api/search',
 ];
 
 function authPath(req, res, next){
