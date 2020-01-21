@@ -9,47 +9,83 @@ const searchAPIController = {
         app.post('/api/search', function(req, res){
             new Promise((resolve) => {
                 resolve(
-                    new Promise((resolve) => {
-
+                    new Promise((resolve, reject) => {
+                        if(req.body.type === 'Listings' || req.body.type === 'Users'){
+                            // If the type is valid
+                            resolve(true);
+                        }
+                        else{
+                            // Type does not exists
+                            const err = new Error('Search type does not exists');
+                            err.code = 'SEARCH_TYPE';
+                            reject(err);
+                        }
                     })
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(404).send({
+                                'Error': err.message,
+                                'error_code': err.code
+                            });
+                            throw err.code;
+                        }
+                    )
                 );
             })
             .then(
                 function(){
-                    return new Promise((resolve, reject) => {
+                    return new Promise((resolve) => {
                         if(req.user === undefined || req.user === null){
                             // If there is no user logined
                             if(req.body.type === 'Listings'){
                                 // Search for listing
                                 resolve(
                                     dataAccess.listing.searchWithoutUser(req.body.search)
-                                    .catch(
-                                        function(err){
-                                            console.log(err);
-                                            res.status(500).send({
-                                                'Error': 'MySQL error',
-                                                'error_code': 'MYSQL_ERR'
-                                            });
-                                            throw 'MYSQL_ERR';
-                                        }
-                                    )
                                 );
                             }
                             else if(req.body.type === 'Users'){
                                 // Search for users
-                            }
-                            else{
-                                // There is an error
-                                const err = new Error('Search type does not exists');
-                                err.code = 'SEARCH_TYPE';
-                                reject(err);
+                                resolve(
+                                    dataAccess.user.searchWithoutUser(req.body.search)
+                                );
                             }
                         }
                         else{
                             // If there was a user logined
-
+                            if(req.body.type === 'Listings'){
+                                // Search for listing
+                                resolve(
+                                    dataAccess.listing.searchWithUser(req.body.search, req.user.user_id)
+                                );
+                            }
+                            else if(req.body.type === 'Users'){
+                                // Search for users
+                                resolve(
+                                    dataAccess.listing.searchWithUser(req.body.search, req.user.user_id)
+                                );
+                            }
                         }
-                    })               
+                    })
+                    .catch(
+                        function(err){
+                            // Any Mysql error is captured here
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL Error',
+                                'error_code': 'MYSQL_ERR'
+                            });
+                            throw 'MYSQL_ERR';
+                        }
+                    );
+                }
+            )
+            .then(
+                function(data){
+                    res.status(200).send({
+                        'Result': 'Search was successful',
+                        'data': data
+                    });
                 }
             )
             .catch(

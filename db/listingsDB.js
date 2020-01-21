@@ -260,7 +260,7 @@ const listingsDB = {
         return new Promise((resolve, reject) => {
             this.pool.query(`
             SELECT * FROM LISTINGS
-            WHERE ((deleted = ?) AND (title REGEXP ?))  
+            WHERE ((deleted = 0) AND (title REGEXP ?))  
             `, [search_query], function(err, data){
                 if(err){
                     reject(err);
@@ -271,8 +271,20 @@ const listingsDB = {
             });
         });
     },
-    searchWithUser(search_query, user){
-        return;
+    searchWithUser(search_query, user_id){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT * FROM LISTINGS
+            WHERE ((deleted = 0) AND (title REGEXP ?) AND (NOT (listing_user_id = ?)))  
+            `, [search_query, user_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
     }
 };
 

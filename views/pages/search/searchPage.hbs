@@ -43,14 +43,16 @@
                     </b-card>
                 </div>
                 <div class="col-8">
-                    <template
-                    v-if='is_searched'
-                    >
-                        <b-card
-                        bg-variant='light'
-                        class="row">
+                    <b-card
+                    bg-variant='light'>
+                        <b-card-text>
+                            <article>
+                                <h3 class="text-center">Your search results</h3>
+                            </article>
+                        </b-card-text>
+                        <b-card-text :class="search_type === null ? '' : 'row'">
                             <template
-                            v-if='listings_or_users'>
+                            v-if='search_type === "Listings"'>
                             {{!-- This is for listings --}}
                                 <b-card
                                 class="col-4 mt-3 mb-3"
@@ -62,7 +64,7 @@
                                 </b-card>
                             </template>
                             <template
-                            v-else>
+                            v-else-if='search_type === "Users"'>
                             {{!-- This is for users --}}
                                 <b-card
                                 class="col-4 mt-3 mb-3"
@@ -70,18 +72,28 @@
 
                                 </b-card>
                             </template>
-                        </b-card>
-                    </template>
-                    <template
-                    v-else>
-                        <b-card>
-                            <b-card-text>
-                                <article>
-                                    <h3>You have not searched for anything</h3>
-                                </article>
-                            </b-card-text>
-                        </b-card>
-                    </template>
+                            <template
+                            v-else>
+                            {{!-- For when there is nothing showing up on the search --}}
+                                <b-card-text>
+                                    <article>
+                                        <h2 class="text-center">Oops looks like your search returned nothing</h2>
+                                    </article>
+                                </b-card-text>
+                            </template>                           
+                        </b-card-text>
+                        <b-card-text>
+                            <template
+                            v-if='search_type !== null'>
+                                {{!-- If there is search results to show, below is the pagination bar --}}
+                                    <b-pagination
+                                    v-model="current_page"
+                                    :total-rows="chunks"
+                                    :per-page="1"
+                                    ></b-pagination>
+                            </template>
+                        </b-card-text>
+                    </b-card>
                 </div>
             </div>
         </div>
@@ -104,23 +116,54 @@
             // For showing the listings or users
             // bool to control what is showing
             // true for listings, false for users
-            listings_or_users: null,
-            // List containing items shown in the search result
-            current_showing: [],
+            search_type: null,
             // List of everything returned
             all_items: [],
-            is_searched: false,
-
+            chunks: null,
+            // For the pagination
+            current_page: 1,
         },
         methods: {
             onSubmit(event){
-                event.preventDefault();
+                if(event){
+                    event.preventDefault();
+                }
+                const type = this.form.type;
                 axios
                 .post('/api/search', this.form)
                 .then(
                     function(res){
-                        console.log(res);
-                    }
+                        const data = res.data.data;
+                        if(data.length === 0){
+                            // If there was no data returned
+                            this.search_type = null;    
+                            this.all_items = [];
+                            this.current_showing = [];
+                        }
+                        else{
+                            // There is data
+                            // Setting the type
+                            this.search_type = type;
+                            // Setting the data
+                            // Splitting them into chunks
+                            let chunks = 0;
+                            let all_items = [];
+                            if(data.length % 9 === 0){
+                                chunks = data.length / 9;
+                            }
+                            else{
+                                chunks = Math.floor(data.length / 9) + 1;
+                            }
+                            // Splicing the elements in multiples
+                            for(let i=0; i<chunks - 1; i++){
+                                all_items.push(data.slice(i * 9, (i+1) * 9));
+                            }
+                            // Pushing the last few not making a multiple
+                            all_items.push(data.slice((chunks - 1) * 9, data.length));
+                            this.chunks = chunks;
+                            this.all_items = all_items;
+                        }
+                    }.bind(this)
                 )
                 .catch(
                     function(err){
@@ -148,8 +191,14 @@
                     this.form.type = type_param;
                     this.form.search = search_param;
                     // Search using these params
+                    this.onSubmit(null);
                 }
             }
+        },
+        computed:{
+            current_showing(){
+                return this.all_items[this.current_page - 1];
+            },
         },
         created(){
             this.checkingParams();

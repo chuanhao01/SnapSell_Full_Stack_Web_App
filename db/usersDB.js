@@ -236,6 +236,37 @@ const usersDB = {
                 return resolve(same);
             });
         });
+    },
+    // Dealing with searching for users
+    searchWithUser(search_query, user_id){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT username, avatar_icon_file_name, created_timestamp FROM USERS
+            WHERE ((delted = 0) AND (username REGEXP ?) AND (NOT (user_id = ?)))
+            `, [search_query, user_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
+    },
+    searchWithoutUser(search_query){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT username, avatar_icon_file_name, created_timestamp FROM USERS
+            WHERE ((delted = 0) AND (username REGEXP ?))
+            `, [search_query], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
     }
 };
 
