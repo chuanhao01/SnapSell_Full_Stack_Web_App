@@ -1,0 +1,159 @@
+<main class="container-fluid">
+    <div class="row">
+        <div class="col-1"></div>
+        <div class="col-10 mt-3">
+            <div class="row">
+                <div class="col-4">
+                    <b-card>
+                        <b-card-text>
+                            <article>
+                                <h3>Searching for something?</h3>
+                            </article>
+                        </b-card-text>
+                        <b-card-text>
+                            <b-form
+                            @submit='onSubmit'
+                            @reset='onReset'
+                            v-if='showForm'
+                            >
+                                <b-form-group
+                                label='Type of search'
+                                label-for='fType'>
+                                    <b-form-select
+                                    id="fType"
+                                    v-model="form.type"
+                                    :options="types"
+                                    required>
+                                    </b-form-select>
+                                </b-form-group>
+                                <b-form-group
+                                label-for='fSearch'
+                                >
+                                    <b-form-input
+                                    placeholder="Search"
+                                    id='fSearch'
+                                    v-model='form.search'
+                                    required
+                                    ></b-form-input>
+                                </b-form-group>
+                                <b-button type='submit' variant='primary'>Search</b-button>
+                                <b-button type='reset' variant='danger'>Reset</b-button>
+                            </b-form>
+                        </b-card-text>
+                    </b-card>
+                </div>
+                <div class="col-8">
+                    <template
+                    v-if='is_searched'
+                    >
+                        <b-card
+                        bg-variant='light'
+                        class="row">
+                            <template
+                            v-if='listings_or_users'>
+                            {{!-- This is for listings --}}
+                                <b-card
+                                class="col-4 mt-3 mb-3"
+                                v-for='listing in current_showing'
+                                :title='listing.title'
+                                :bg-variant='listing.availability ? "primary" : "light"'
+                                >
+
+                                </b-card>
+                            </template>
+                            <template
+                            v-else>
+                            {{!-- This is for users --}}
+                                <b-card
+                                class="col-4 mt-3 mb-3"
+                                >
+
+                                </b-card>
+                            </template>
+                        </b-card>
+                    </template>
+                    <template
+                    v-else>
+                        <b-card>
+                            <b-card-text>
+                                <article>
+                                    <h3>You have not searched for anything</h3>
+                                </article>
+                            </b-card-text>
+                        </b-card>
+                    </template>
+                </div>
+            </div>
+        </div>
+        <div class="col-1"></div>
+    </div>
+</main>
+
+{{#section 'scripts'}}
+<script>
+    const app = new Vue({
+        el: '#app',
+        data: {
+            // For the form
+            form: {
+                type: 'Listings',
+                search: null,
+            },
+            types: ['Listings', 'Users'],
+            showForm: true,
+            // For showing the listings or users
+            // bool to control what is showing
+            // true for listings, false for users
+            listings_or_users: null,
+            // List containing items shown in the search result
+            current_showing: [],
+            // List of everything returned
+            all_items: [],
+            is_searched: false,
+
+        },
+        methods: {
+            onSubmit(event){
+                event.preventDefault();
+                axios
+                .post('/api/search/', this.form)
+                .then(
+                    function(res){
+                        console.log(res);
+                    }
+                )
+                .catch(
+                    function(err){
+                        console.log(err);
+                    }
+                );
+
+            },
+            onReset(event){
+                event.preventDefault();
+                this.form.type = 'Listings',
+                this.form.search = null;
+                //This is to reload the form to make it empty
+                this.showForm = false;
+                Vue.nextTick(() => {
+                    this.showForm = true;
+                });
+            },
+            checkingParams(){
+                const current_url = new URL(window.location.href)
+                const type_param = current_url.searchParams.get('type'),
+                search_param = current_url.searchParams.get('search');
+                if(type_param !== null && search_param !== null){
+                    // There are params in the url
+                    this.form.type = type_param;
+                    this.form.search = search_param;
+                    // Search using these params
+                }
+            }
+        },
+        created(){
+            this.checkingParams();
+        }
+    });
+</script>
+{{/section}}
