@@ -1,0 +1,241 @@
+<main class="container-fluid">
+    <div class="row">
+        <div class="col-1"></div>
+        <div class="col-10 mt-3">
+            <div class="row">
+                <div class="col-4">
+                    <b-card>
+                        <b-card-text>
+                            <article>
+                                <h3>Searching for something?</h3>
+                            </article>
+                        </b-card-text>
+                        <b-card-text>
+                            <b-form
+                            @submit='onSubmit'
+                            @reset='onReset'
+                            v-if='showForm'
+                            >
+                                <b-form-group
+                                label='Type of search'
+                                label-for='fType'>
+                                    <b-form-select
+                                    id="fType"
+                                    v-model="form.type"
+                                    :options="types"
+                                    required>
+                                    </b-form-select>
+                                </b-form-group>
+                                <b-form-group
+                                label-for='fSearch'
+                                >
+                                    <b-form-input
+                                    placeholder="Search"
+                                    id='fSearch'
+                                    v-model='form.search'
+                                    required
+                                    ></b-form-input>
+                                </b-form-group>
+                                <b-button type='submit' variant='primary'>Search</b-button>
+                                <b-button type='reset' variant='danger'>Reset</b-button>
+                            </b-form>
+                        </b-card-text>
+                    </b-card>
+                </div>
+                <div class="col-8">
+                    <b-card
+                    bg-variant='light'>
+                        <b-card-text>
+                            <article>
+                                <h3 class="text-center">Your search results</h3>
+                            </article>
+                        </b-card-text>
+                        <b-card-text :class="search_type === null ? '' : 'row'">
+                            <template
+                            v-if='search_type === "Listings"'>
+                            {{!-- This is for listings --}}
+                                <b-card
+                                class="col-4 mt-3 mb-3"
+                                v-for='listing in current_showing'
+                                :title='listing.title'
+                                :bg-variant='listing.availability ? "primary" : "light"'
+                                header-tag='header'
+                                >
+                                    <template
+                                    v-slot:header>
+                                        <div style="width: 50px; height: 50px;">
+                                            <b-img rounded='circle' thumbnail fluid :src='`/api/user/other/${listing.listing_user_id}/avatar_icon`'></b-img>
+                                        </div>
+                                        <article>
+                                            <p>\{{listing.listing_user_username}}</p>
+                                        </article>
+                                    </template>
+                                    <b-card-text>
+                                        {{!-- Here is the price --}}
+                                        <article>
+                                            <p>S$\{{listing.price}}</p>
+                                            <p>\{{listing.description}}</p>
+                                            <p>Made \{{listing.created_timestamp.fromNow()}}</p>
+                                        </article>
+                                    </b-card-text>
+                                    <b-card-text>
+                                        <b-button variant='primary' :href='`/listing/${listing.listing_id}`'>View</b-button>
+                                    </b-card-text>
+                                </b-card>
+                            </template>
+                            <template
+                            v-else-if='search_type === "Users"'>
+                            {{!-- This is for users --}}
+                                <b-card
+                                class="col-4 mt-3 mb-3"
+                                v-for='user in current_showing'
+                                :title='user.username'
+                                >
+                                    <b-card-text>
+                                        <div style="width: 100px; height: 100px;">
+                                            <b-img rounded='circle' thumbnail fluid :src='`/api/user/other/${user.user_id}/avatar_icon`'></b-img>
+                                        </div>
+                                    </b-card-text>
+                                    <b-card-text>
+                                        <article>
+                                            <p>Joined \{{user.created_timestamp.fromNow()}}</p>
+                                        </article>
+                                    </b-card-text>
+                                </b-card>
+                            </template>
+                            <template
+                            v-else>
+                            {{!-- For when there is nothing showing up on the search --}}
+                                <b-card-text>
+                                    <article>
+                                        <h2 class="text-center">Oops looks like your search returned nothing</h2>
+                                    </article>
+                                </b-card-text>
+                            </template>                           
+                        </b-card-text>
+                        <b-card-text>
+                            <template
+                            v-if='search_type !== null'>
+                                {{!-- If there is search results to show, below is the pagination bar --}}
+                                    <b-pagination
+                                    v-model="current_page"
+                                    :total-rows="chunks"
+                                    :per-page="1"
+                                    ></b-pagination>
+                            </template>
+                        </b-card-text>
+                    </b-card>
+                </div>
+            </div>
+        </div>
+        <div class="col-1"></div>
+    </div>
+</main>
+
+{{#section 'scripts'}}
+<script>
+    const app = new Vue({
+        el: '#app',
+        data: {
+            // For the form
+            form: {
+                type: 'Listings',
+                search: null,
+            },
+            types: ['Listings', 'Users'],
+            showForm: true,
+            // For showing the listings or users
+            // bool to control what is showing
+            // true for listings, false for users
+            search_type: null,
+            // List of everything returned
+            all_items: [],
+            chunks: null,
+            // For the pagination
+            current_page: 1,
+        },
+        methods: {
+            onSubmit(event){
+                if(event){
+                    event.preventDefault();
+                }
+                const type = this.form.type;
+                axios
+                .post('/api/search', this.form)
+                .then(
+                    function(res){
+                        const data = res.data.data;
+                        for(let ob of data){
+                            ob.created_timestamp = moment(ob.created_timestamp);
+                        }
+                        if(data.length === 0){
+                            // If there was no data returned
+                            this.search_type = null;    
+                            this.all_items = [];
+                        }
+                        else{
+                            // There is data
+                            // Setting the type
+                            this.search_type = type;
+                            // Setting the data
+                            // Splitting them into chunks
+                            let chunks = 0;
+                            let all_items = [];
+                            if(data.length % 9 === 0){
+                                chunks = data.length / 9;
+                            }
+                            else{
+                                chunks = Math.floor(data.length / 9) + 1;
+                            }
+                            // Splicing the elements in multiples
+                            for(let i=0; i<chunks - 1; i++){
+                                all_items.push(data.slice(i * 9, (i+1) * 9));
+                            }
+                            // Pushing the last few not making a multiple
+                            all_items.push(data.slice((chunks - 1) * 9, data.length));
+                            this.chunks = chunks;
+                            this.all_items = all_items;
+                        }
+                    }.bind(this)
+                )
+                .catch(
+                    function(err){
+                        console.log(err);
+                    }
+                );
+
+            },
+            onReset(event){
+                event.preventDefault();
+                this.form.type = 'Listings',
+                this.form.search = null;
+                //This is to reload the form to make it empty
+                this.showForm = false;
+                Vue.nextTick(() => {
+                    this.showForm = true;
+                });
+            },
+            checkingParams(){
+                const current_url = new URL(window.location.href)
+                const type_param = current_url.searchParams.get('type'),
+                search_param = current_url.searchParams.get('search');
+                if(type_param !== null && search_param !== null){
+                    // There are params in the url
+                    this.form.type = type_param;
+                    this.form.search = search_param;
+                    // Search using these params
+                    this.onSubmit(null);
+                }
+            }
+        },
+        computed:{
+            current_showing(){
+                return this.all_items[this.current_page - 1];
+            },
+        },
+        created(){
+            this.checkingParams();
+        }
+    });
+</script>
+{{/section}}

@@ -240,12 +240,47 @@ const listingsDB = {
             });
         });
     },
+    // Get all the pictures that is linked to a listing, by the listing id
     getListingPicturesById(listing_id){
         return new Promise((resolve, reject) => {
             this.pool.query(`
             SELECT * FROM LISTING_PICTURES
             WHERE ((listing_id = ?) AND (deleted = 0)) 
             `, [listing_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
+    },
+    // Delete a picture by its listing_picture_file_name
+    deleteListingPictureByFileName(listing_picture_file_name){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            UPDATE LISTING_PICTURES
+            SET deleted = 1
+            WHERE ((listing_picture_file_name = ?) AND (deleted = 0)) 
+            `, [listing_picture_file_name], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
+    },
+    // Dealing with searching for listings
+    searchWithUser(search_query, user_id){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            SELECT l.listing_id, l.title, l.description, l.price, l.listing_user_id, l.created_timestamp, l.availability, l.last_modified_timestamp, u.username as listing_user_username
+            FROM LISTINGS l LEFT JOIN USERS u ON l.listing_user_id = u.user_id
+            WHERE ((l.deleted = 0) AND (l.title REGEXP ?) AND (NOT (l.listing_user_id = ?)));
+            `, [search_query, user_id], function(err, data){
                 if(err){
                     reject(err);
                 }
