@@ -59,8 +59,28 @@
                                 v-for='listing in current_showing'
                                 :title='listing.title'
                                 :bg-variant='listing.availability ? "primary" : "light"'
+                                header-tag='header'
                                 >
-
+                                    <template
+                                    v-slot:header>
+                                        <div style="width: 50px; height: 50px;">
+                                            <b-img rounded='circle' thumbnail fluid :src='`/api/user/other/${listing.listing_user_id}/avatar_icon`'></b-img>
+                                        </div>
+                                        <article>
+                                            <p>\{{listing.listing_user_username}}</p>
+                                        </article>
+                                    </template>
+                                    <b-card-text>
+                                        {{!-- Here is the price --}}
+                                        <article>
+                                            <p>S$\{{listing.price}}</p>
+                                            <p>\{{listing.description}}</p>
+                                            <p>Made \{{listing.created_timestamp.fromNow()}}</p>
+                                        </article>
+                                    </b-card-text>
+                                    <b-card-text>
+                                        <b-button variant='primary' :href='`/listing/${listing.listing_id}`'>View</b-button>
+                                    </b-card-text>
                                 </b-card>
                             </template>
                             <template
@@ -134,6 +154,9 @@
                 .then(
                     function(res){
                         const data = res.data.data;
+                        for(let ob of data){
+                            ob.created_timestamp = moment(ob.created_timestamp);
+                        }
                         if(data.length === 0){
                             // If there was no data returned
                             this.search_type = null;    
