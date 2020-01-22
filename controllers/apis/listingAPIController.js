@@ -493,7 +493,6 @@ const listingAPIController = {
                         )
                         .then(
                             function(){
-                                // If creating a user is successful
                                 res.status(201).send({
                                     'Result': 'Picture successfully added'
                                 });
@@ -508,6 +507,81 @@ const listingAPIController = {
                     }
                 }
             });
+        });
+        // Delete a listing picture
+        app.delete('/api/listing/pictures/:listing_id', function(req, res){
+            // Note for this request, we expect the listing_picture_file-name to be in the body
+            new Promise((resolve) => {
+                resolve(
+                    dataAccess.listing.checkIfUserListing(req.params.listing_id, req.user.user_id)
+                    .catch(
+                        function(err){
+                            // If there was any MySQL errors
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL error',
+                                'error_code': 'MySQL_ERR'
+                            });
+                            throw 'MYSQL_ERR';
+                    })
+                );
+            })
+            .then(
+                function(user_listing_own){
+                    return new Promise((resolve, reject) => {
+                        if(user_listing_own){
+                            // If the user owns the listing, let him delete the image
+                            resolve(true);
+                        }
+                        else{
+                            // User does not own the listing
+                            const err = new Error('Listing does not belong to user');
+                            err.code = 'USER_UNAUTH_LISTING';
+                            reject(err);
+                        }
+                    })
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(401).send({
+                                'Error': 'You cannot delete this listing picture',
+                                'error_code': 'USER_UNAUTH_LISTING'
+                            });
+                            throw err.code;                           
+                        }
+                    );
+                }
+            )
+            .then(
+                function(){
+                    // If the user does own the listing
+                    return dataAccess.listing.deleteListingPictureByFileName(req.body.listing_picture_file_name)
+                    .catch(
+                        function(err){
+                            // If there was any MySQL errors
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL error',
+                                'error_code': 'MySQL_ERR'
+                            });
+                            throw 'MYSQL_ERR';
+                        }
+                    );
+                }
+            )
+            .then(
+                function(){
+                    // Deleting the listing picture is successful
+                    res.status(200).send({
+                        'Result': 'Listing picture was successfully deleted'
+                    });
+                }
+            )
+            .catch(
+                function(err){
+                    console.log('Final catch err: ' + err);
+                }
+            );
         });
         // Affecting the picture file directly, /api/listing/picture 
         app.get('/api/listing/picture/:listing_picture_file_name', function(req, res){

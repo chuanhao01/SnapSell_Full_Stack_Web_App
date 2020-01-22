@@ -37,6 +37,9 @@
                             <p class="mt-4">
                             Picture #: \{{ slide + 1 }}
                             </p>
+                            <div>
+                                <b-button variant='warning' :href='`/user/listing/picture/edit/${listing.listing_id}`'>Edit the images of your product</b-button>
+                            </div>
                         </template>
                         <template
                         v-else>

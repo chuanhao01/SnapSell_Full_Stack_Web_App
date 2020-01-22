@@ -240,12 +240,30 @@ const listingsDB = {
             });
         });
     },
+    // Get all the pictures that is linked to a listing, by the listing id
     getListingPicturesById(listing_id){
         return new Promise((resolve, reject) => {
             this.pool.query(`
             SELECT * FROM LISTING_PICTURES
             WHERE ((listing_id = ?) AND (deleted = 0)) 
             `, [listing_id], function(err, data){
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(data);
+                }
+            });
+        });
+    },
+    // Delete a picture by its listing_picture_file_name
+    deleteListingPictureByFileName(listing_picture_file_name){
+        return new Promise((resolve, reject) => {
+            this.pool.query(`
+            UPDATE LISTING_PICTURES
+            SET deleted = 1
+            WHERE ((listing_picture_file_name = ?) AND (deleted = 0)) 
+            `, [listing_picture_file_name], function(err, data){
                 if(err){
                     reject(err);
                 }
