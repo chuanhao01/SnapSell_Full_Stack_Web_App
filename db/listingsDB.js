@@ -256,26 +256,12 @@ const listingsDB = {
         });
     },
     // Dealing with searching for listings
-    searchWithoutUser(search_query){
-        return new Promise((resolve, reject) => {
-            this.pool.query(`
-            SELECT * FROM LISTINGS
-            WHERE ((deleted = 0) AND (title REGEXP ?))  
-            `, [search_query], function(err, data){
-                if(err){
-                    reject(err);
-                }
-                else{
-                    resolve(data);
-                }
-            });
-        });
-    },
     searchWithUser(search_query, user_id){
         return new Promise((resolve, reject) => {
             this.pool.query(`
-            SELECT * FROM LISTINGS
-            WHERE ((deleted = 0) AND (title REGEXP ?) AND (NOT (listing_user_id = ?)))  
+            SELECT l.listing_id, l.title, l.description, l.price, l.listing_user_id, l.created_timestamp, l.availability, l.last_modified_timestamp, u.username as listing_user_username
+            FROM LISTINGS l LEFT JOIN USERS u ON l.listing_user_id = u.user_id
+            WHERE ((l.deleted = 0) AND (l.title REGEXP ?) AND (NOT (l.listing_user_id = ?)));
             `, [search_query, user_id], function(err, data){
                 if(err){
                     reject(err);

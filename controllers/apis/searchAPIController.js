@@ -36,35 +36,17 @@ const searchAPIController = {
             .then(
                 function(){
                     return new Promise((resolve) => {
-                        if(req.user === undefined || req.user === null){
-                            // If there is no user logined
-                            if(req.body.type === 'Listings'){
-                                // Search for listing
-                                resolve(
-                                    dataAccess.listing.searchWithoutUser(req.body.search)
-                                );
-                            }
-                            else if(req.body.type === 'Users'){
-                                // Search for users
-                                resolve(
-                                    dataAccess.user.searchWithoutUser(req.body.search)
-                                );
-                            }
+                        if(req.body.type === 'Listings'){
+                            // Search for listing
+                            resolve(
+                                dataAccess.listing.searchWithUser(req.body.search, req.user.user_id)
+                            );
                         }
-                        else{
-                            // If there was a user logined
-                            if(req.body.type === 'Listings'){
-                                // Search for listing
-                                resolve(
-                                    dataAccess.listing.searchWithUser(req.body.search, req.user.user_id)
-                                );
-                            }
-                            else if(req.body.type === 'Users'){
-                                // Search for users
-                                resolve(
-                                    dataAccess.listing.searchWithUser(req.body.search, req.user.user_id)
-                                );
-                            }
+                        else if(req.body.type === 'Users'){
+                            // Search for users
+                            resolve(
+                                dataAccess.listing.searchWithUser(req.body.search, req.user.user_id)
+                            );
                         }
                     })
                     .catch(
