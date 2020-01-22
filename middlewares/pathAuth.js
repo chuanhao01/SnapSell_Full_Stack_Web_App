@@ -10,9 +10,6 @@ const whitelisted_paths = [
     '/api/login',
     '/api/refresh_token',
     '/error/403',
-    // Searching
-    '/search',
-    '/api/search',
 ];
 
 function authPath(req, res, next){
