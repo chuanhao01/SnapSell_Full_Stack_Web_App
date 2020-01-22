@@ -72,20 +72,6 @@
                 </b-navbar-nav>
                 <b-navbar-nav class="ml-auto">
                     {{!-- Right side --}}
-                    <b-nav-form class="mr-3">
-                        <b-input-group>
-                            <template v-slot:prepend>
-                                <b-dropdown text="Listings" variant="secondary" id="searchDrop">
-                                    <b-dropdown-item-button id='searchListing'>Listings</b-dropdown-item-button>
-                                    <b-dropdown-item-button id="searchUser">Users</b-dropdown-item-button>
-                                </b-dropdown>
-                            </template>
-                            <b-form-input placeholder="Search"></b-form-input>
-                            <template v-slot:append>
-                                <b-button id="searchSubmit">Search</b-button>
-                            </template>
-                        </b-input-group>
-                    </b-nav-form>
                     <b-nav-item href="/login">Login</b-nav-item>
                     <b-nav-item href="/account/create">Create an account</b-nav-item>
                 </b-navbar-nav>
