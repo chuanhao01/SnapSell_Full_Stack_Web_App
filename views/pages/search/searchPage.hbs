@@ -88,8 +88,19 @@
                             {{!-- This is for users --}}
                                 <b-card
                                 class="col-4 mt-3 mb-3"
+                                v-for='user in current_showing'
+                                :title='user.username'
                                 >
-
+                                    <b-card-text>
+                                        <div style="width: 100px; height: 100px;">
+                                            <b-img rounded='circle' thumbnail fluid :src='`/api/user/other/${user.user_id}/avatar_icon`'></b-img>
+                                        </div>
+                                    </b-card-text>
+                                    <b-card-text>
+                                        <article>
+                                            <p>Joined \{{user.created_timestamp.fromNow()}}</p>
+                                        </article>
+                                    </b-card-text>
                                 </b-card>
                             </template>
                             <template
@@ -161,7 +172,6 @@
                             // If there was no data returned
                             this.search_type = null;    
                             this.all_items = [];
-                            this.current_showing = [];
                         }
                         else{
                             // There is data

@@ -45,7 +45,7 @@ const searchAPIController = {
                         else if(req.body.type === 'Users'){
                             // Search for users
                             resolve(
-                                dataAccess.listing.searchWithUser(req.body.search, req.user.user_id)
+                                dataAccess.user.searchWithUser(req.body.search, req.user.user_id)
                             );
                         }
                     })

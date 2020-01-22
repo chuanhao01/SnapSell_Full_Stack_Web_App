@@ -241,8 +241,8 @@ const usersDB = {
     searchWithUser(search_query, user_id){
         return new Promise((resolve, reject) => {
             this.pool.query(`
-            SELECT username, avatar_icon_file_name, created_timestamp FROM USERS
-            WHERE ((delted = 0) AND (username REGEXP ?) AND (NOT (user_id = ?)))
+            SELECT username, avatar_icon_file_name, created_timestamp, user_id FROM USERS
+            WHERE ((deleted = 0) AND (username REGEXP ?) AND (NOT (user_id = ?)))
             `, [search_query, user_id], function(err, data){
                 if(err){
                     reject(err);
