@@ -10,6 +10,13 @@ const validationUtils = {
             }
         }
         return false;
+    },
+    checkNumber(field){
+        // Returns true if it is a number and false otherwise
+        return !isNaN(field);
+    },
+    checkPositive(field){
+        return field > 0;
     }
 };
 

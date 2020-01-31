@@ -42,130 +42,208 @@ const offerAPIController = {
         });
         // Adding an offer for a listing 
         app.post('/api/offer/:listing_id', function(req, res){
-            if(utils.validation.checkEmpty(req.body)){
-                res.status(500).send({
-                    'Error': 'Some fields are empty'
-                });
-                return;
-            }
-            else{
-                new Promise((resolve) => {
-                    resolve(
-                        dataAccess.listing.checkIfUserListing(req.params.listing_id, req.user.user_id)
-                        .catch(
-                            function(err){
-                                console.log(err);
-                                res.status(500).send({
-                                    'Error': 'MySQL_ERR',
-                                    'error_code': 'MySQL_ERR'
-                                });
-                                throw 'MySQL_ERR';
-                            }
-                        )
-                    );
-                })
-                .then(
-                    function(user_listing_own){
-                        return new Promise((resolve, reject) =>{
-                            if(user_listing_own){
-                                // If the user owns the listing
-                                const err = new Error('Its the user listing he is trying to offer on');
-                                err.code = 'CANNOT_OFFER_OWN_LISTING';
-                                reject(err);
+            new Promise((resolve) => {
+                resolve(
+                    // First we check if there are any empty fields
+                    new Promise((resolve, reject) => {
+                        if(!utils.validation.checkEmpty(req.body)){
+                            // if it is not empty, check if the price is a number
+                            if(utils.validation.checkNumber(req.body.offer_price)){
+                                // if it is a number, check if it is positive
+                                if(utils.validation.checkPositive(req.body.offer_price)){
+                                    // Passes all checks
+                                    resolve(true);
+                                }
+                                else{
+                                    const err = new Error('Offer price is negative');
+                                    err.code = 'PRICE_NEGATIVE';
+                                    reject(err);
+                                }
                             }
                             else{
-                                // If he is not the owner, let him add the offer
-                                resolve(true);
-                            }
-                        })
-                        .catch(
-                            function(err){
-                                console.log(err);
-                                res.status(401).send({
-                                    'Error': 'You cannot add this offer',
-                                    'error_code': err.code
-                                });
-                                throw err.code;
-                            }
-                        );
-                    }
-                )
-                .then(
-                    function(){
-                        // If he is able to add an offer, check if he has already made an offer
-                        return dataAccess.offer.checkUserPlacedOffer(req.params.listing_id, req.user.user_id)
-                        .catch(
-                            function(err){
-                                console.log(err);
-                                res.status(500).send({
-                                    'Error': 'MySQL_ERR',
-                                    'error_code': 'MySQL_ERR'
-                                });
-                                throw 'MySQL_ERR';
-                            }
-                        );
-                    }
-                )
-                .then(
-                    function(user_offer_placed){
-                        return new Promise((resolve, reject) => {
-                            if(user_offer_placed){
-                                // If the user has already placed an offer, send an error
-                                const err = new Error('Already has an offer');
-                                err.code = 'OFFER_PLACED_ALR';
+                                // Not number
+                                const err = new Error('The offer price is not a number');
+                                err.code = 'PRICE_EMPTY';
                                 reject(err);
                             }
-                            else{
-                                // If he has not placed an offer before, create the offer
-                                resolve(true);
-                            }
-                        })
-                        .catch(
-                            function(err){
-                                console.log(err);
-                                res.status(401).send({
-                                    'Error': err,
-                                    'error_code': err.code
-                                });
-                                throw err.code;
-                            }
-                        );
-                    }
-                )
-                .then(
-                    function(){
-                        return dataAccess.offer.addAnOffer(req.params.listing_id, req.user.user_id, req.body.offer_price)
-                        .catch(
-                            function(err){
-                                console.log(err);
-                                res.status(500).send({
-                                    'Error': 'MySQL_ERR',
-                                    'error_code': 'MySQL_ERR'
-                                });
-                                throw 'MySQL_ERR';
-                            }
-                        );
-                    }
-                )
-                .then(
-                    function(){
-                        // If adding the offer was successful
-                        res.status(200).send({
-                            'Result': 'Offer was successfully added'
-                        });
-                    }
-                )
-                .catch(
-                    function(err){
-                        // Final catch for all errors
-                        console.log('Final catch err: ' + err);
-                    }
+                        }
+                        else{
+                            const err = new Error('Some fields are empty');
+                            err.code = 'EMPTY_FIELDS';
+                            reject(err);
+                        }
+                    })
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(400).send({
+                                'Error': err.message,
+                                'error_code': err.code
+                            });
+                            throw err.code;
+                        }
+                    )
                 );
-            }
+            })
+            .then(
+                function(){
+                    return dataAccess.listing.checkIfUserListing(req.params.listing_id, req.user.user_id)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL_ERR',
+                                'error_code': 'MySQL_ERR'
+                            });
+                            throw 'MySQL_ERR';
+                        }
+                    );
+                }
+            )
+            .then(
+                function(user_listing_own){
+                    return new Promise((resolve, reject) =>{
+                        if(user_listing_own){
+                            // If the user owns the listing
+                            const err = new Error('Its the user listing he is trying to offer on');
+                            err.code = 'CANNOT_OFFER_OWN_LISTING';
+                            reject(err);
+                        }
+                        else{
+                            // If he is not the owner, let him add the offer
+                            resolve(true);
+                        }
+                    })
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(401).send({
+                                'Error': 'You cannot add this offer',
+                                'error_code': err.code
+                            });
+                            throw err.code;
+                        }
+                    );
+                }
+            )
+            .then(
+                function(){
+                    // If he is able to add an offer, check if he has already made an offer
+                    return dataAccess.offer.checkUserPlacedOffer(req.params.listing_id, req.user.user_id)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL_ERR',
+                                'error_code': 'MySQL_ERR'
+                            });
+                            throw 'MySQL_ERR';
+                        }
+                    );
+                }
+            )
+            .then(
+                function(user_offer_placed){
+                    return new Promise((resolve, reject) => {
+                        if(user_offer_placed){
+                            // If the user has already placed an offer, send an error
+                            const err = new Error('Already has an offer');
+                            err.code = 'OFFER_PLACED_ALR';
+                            reject(err);
+                        }
+                        else{
+                            // If he has not placed an offer before, create the offer
+                            resolve(true);
+                        }
+                    })
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(401).send({
+                                'Error': err,
+                                'error_code': err.code
+                            });
+                            throw err.code;
+                        }
+                    );
+                }
+            )
+            .then(
+                function(){
+                    return dataAccess.offer.addAnOffer(req.params.listing_id, req.user.user_id, req.body.offer_price)
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL_ERR',
+                                'error_code': 'MySQL_ERR'
+                            });
+                            throw 'MySQL_ERR';
+                        }
+                    );
+                }
+            )
+            .then(
+                function(){
+                    // If adding the offer was successful
+                    res.status(200).send({
+                        'Result': 'Offer was successfully added'
+                    });
+                }
+            )
+            .catch(
+                function(err){
+                    // Final catch for all errors
+                    console.log('Final catch err: ' + err);
+                }
+            );
         });
         app.put('/api/offer/:listing_id', function(req, res){
             new Promise((resolve) => {
                 resolve(
+                    // First we check if there are any empty fields
+                    new Promise((resolve, reject) => {
+                        if(!utils.validation.checkEmpty(req.body)){
+                            // if it is not empty, check if the price is a number
+                            if(utils.validation.checkNumber(req.body.offer_price)){
+                                // if it is a number, check if it is positive
+                                if(utils.validation.checkPositive(req.body.offer_price)){
+                                    // Passes all checks
+                                    resolve(true);
+                                }
+                                else{
+                                    const err = new Error('Offer price is negative');
+                                    err.code = 'PRICE_NEGATIVE';
+                                    reject(err);
+                                }
+                            }
+                            else{
+                                // Not number
+                                const err = new Error('The offer price is not a number');
+                                err.code = 'PRICE_EMPTY';
+                                reject(err);
+                            }
+                        }
+                        else{
+                            const err = new Error('Some fields are empty');
+                            err.code = 'EMPTY_FIELDS';
+                            reject(err);
+                        }
+                    })
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(400).send({
+                                'Error': err.message,
+                                'error_code': err.code
+                            });
+                            throw err.code;
+                        }
+                    )
+                );
+            })
+            .then(
+                function(){
                     // Editing the offer 
                     dataAccess.offer.editUserOffer(req.params.listing_id, req.user.user_id, req.body.offer_price)
                     .catch(
@@ -177,9 +255,9 @@ const offerAPIController = {
                             });
                             throw 'MySQL_ERR';
                         }
-                    )
-                );
-            })
+                    );
+                }
+            )
             .then(
                 function(){
                     // If the offer was edited/updated
