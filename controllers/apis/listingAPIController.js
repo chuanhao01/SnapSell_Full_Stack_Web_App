@@ -66,45 +66,80 @@ const listingAPIController = {
         });
         // Adding a listing
         app.post('/api/listing', function(req, res){
-            if(utils.validation.checkEmpty(req.body)){
-                // Checks if any of the fields are empty
-                res.status(500).send({
-                    'Error': 'Some fields are empty'
-                });
-            }
-            else{
-                new Promise((resolve) => {
-                    resolve(
-                        // Tries to create a new listing based on request
-                        dataAccess.listing.createANewListing(req.body.title, req.body.description, req.body.price, req.user.user_id)
-                        .catch(
-                            function(err){
-                                // If there is any MySQL errors
-                                console.log(err);
-                                res.status(500).send({
-                                    'Error': 'MySQL error',
-                                    'error_code': 'MySQL_ERR'
-                                });
-                                throw 'MySQL_ERR';
+            new Promise((resolve) => {
+                resolve(
+                    // First we check if there are any empty fields
+                    new Promise((resolve, reject) => {
+                        if(!utils.validation.checkEmpty(req.body)){
+                            // if it is not empty, check if the price is a number
+                            if(utils.validation.checkNumber(req.body.price)){
+                                // if it is a number, check if it is positive
+                                if(utils.validation.checkPositive(req.body.price)){
+                                    // Passes all checks
+                                    resolve(true);
+                                }
+                                else{
+                                    const err = new Error('Price is negative');
+                                    err.code = 'PRICE_NEGATIVE';
+                                    reject(err);
+                                }
                             }
-                        )
-                    );
-                })
-                .then(
-                    function(){
-                        // If the listing is created 
-                        res.status(201).send({
-                            'Result': 'Listing successfully created'
-                        });
-                    }
-                )
-                .catch(
-                    function(err){
-                        // Final catch for all errors
-                        console.log('Final catch err: ' + err);
-                    }
+                            else{
+                                // Not number
+                                const err = new Error('The price is not a number');
+                                err.code = 'PRICE_EMPTY';
+                                reject(err);
+                            }
+                        }
+                        else{
+                            const err = new Error('Some fields are empty');
+                            err.code = 'EMPTY_FIELDS';
+                            reject(err);
+                        }
+                    })
+                    .catch(
+                        function(err){
+                            console.log(err);
+                            res.status(400).send({
+                                'Error': err.message,
+                                'error_code': err.code
+                            });
+                            throw err.code;
+                        }
+                    )
                 );
-            }
+            })
+            .then(
+                function(){
+                    // Tries to create a new listing based on request
+                    return dataAccess.listing.createANewListing(req.body.title, req.body.description, req.body.price, req.user.user_id)
+                    .catch(
+                        function(err){
+                            // If there is any MySQL errors
+                            console.log(err);
+                            res.status(500).send({
+                                'Error': 'MySQL error',
+                                'error_code': 'MySQL_ERR'
+                            });
+                            throw 'MySQL_ERR';
+                        }
+                    );
+                }
+            )
+            .then(
+                function(){
+                    // If the listing is created 
+                    res.status(201).send({
+                        'Result': 'Listing successfully created'
+                    });
+                }
+            )
+            .catch(
+                function(err){
+                    // Final catch for all errors
+                    console.log('Final catch err: ' + err);
+                }
+            );
         });
         // Afftecting the listing by its id, /api/listing/:listing_id
         // Getting a listing by listing_id
