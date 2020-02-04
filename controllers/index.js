@@ -3,6 +3,7 @@ const homeController = require('./homeController');
 const accountController = require('./accountController');
 const errorController = require('./errorController');
 const userController = require('./userController');
+const searchController = require('./searchController.js');
 
 const APIContollers = require('./apis/index');
 
@@ -13,6 +14,7 @@ const controllers = {
         accountController.init(app);
         errorController.init(app);
         userController.init(app);
+        searchController.init(app);
 
         APIContollers.init(app);
     }

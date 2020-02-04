@@ -3,6 +3,7 @@
 
 const whitelisted_paths = [
     '/',
+    // Account and login
     '/login',
     '/account/create',
     '/api/account',

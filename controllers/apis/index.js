@@ -7,6 +7,7 @@ const listingAPIController = require('./listingAPIController');
 const offerAPIController = require('./offerAPIController');
 const userAPIController = require('./userAPIController');
 const likeAPIController = require('./likeAPIController');
+const searchAPIController = require('./searchAPIController');
 
 const APIControllers = {
     init(app){
@@ -16,6 +17,7 @@ const APIControllers = {
         offerAPIController.init(app);
         userAPIController.init(app);
         likeAPIController.init(app);
+        searchAPIController.init(app);
     }
 };
 

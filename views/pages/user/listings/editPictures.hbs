@@ -1,0 +1,84 @@
+<main class="container-fluid mt-3">
+    <div class="row">
+        <div class="col-12">
+            <b-card
+            bg-variant='light'
+            >
+                <b-card-text>
+                    <article>
+                        <h3 class="text-center">Edit your listing pictures</h3>
+                    </article>
+                </b-card-text>
+                <b-card-text class="row">
+                    <b-card
+                    v-for='(listing_picture, index) in listing_pictures' 
+                    class="col-4 mt-3 mb-3"
+                    >
+                        <b-card-text>
+                            <div style="height: 200px; width: 200px;">
+                                <b-img fluid :src='`/api/listing/picture/${listing_picture.listing_picture_file_name}`'></b-img>
+                            </div>
+                        </b-card-text>
+                        <b-card-text>
+                            <article>
+                                <p>Picture: #\{{index + 1}}</p>
+                            </article>
+                            <b-button variant='danger' @click='deleteListingPicture(listing_picture.listing_picture_file_name)'>Delete this picture</b-button>
+                        </b-card-text>
+                    </b-card>
+                </b-card-text>
+            </b-card>
+        </div>
+    </div>    
+</main>
+
+{{#section 'scripts'}}
+<script>
+    const app = new Vue({
+        el: '#app',
+        data: {
+            listing_pictures: [],
+        },
+        methods: {
+            getListingPictures(){
+                const listing_id = window.location.pathname.split("/").pop();
+                axios
+                .get(`/api/listing/pictures/${listing_id}`)
+                .then(
+                    function(res){
+                        console.log(res);
+                        this.listing_pictures = res.data.listing_pictures;
+                    }.bind(this)
+                )
+                .catch(
+                    function(err){
+                        console.log(err);
+                    }
+                )
+            },
+            deleteListingPicture(listing_picture_file_name){
+                const listing_id = window.location.pathname.split("/").pop();
+                axios
+                .delete(`/api/listing/pictures/${listing_id}`, {
+                    'data': {
+                        'listing_picture_file_name': listing_picture_file_name,
+                    },
+                })
+                .then(
+                    function(res){
+                        console.log(res);
+                    }
+                )
+                .catch(
+                    function(err){
+                        console.log(err)
+                    }
+                )
+            },
+        },
+        created(){
+            this.getListingPictures();
+        },
+    });
+</script>
+{{/section}}
