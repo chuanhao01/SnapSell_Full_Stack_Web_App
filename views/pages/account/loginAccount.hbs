@@ -40,6 +40,7 @@
                     @change='changeInput(form_validation.password)'>
                     </b-form-input>
                 </b-form-group>
+                {{!-- Failed login message --}}
                 <template v-if='login_failed'>
                     <p class="text-danger">Login failed</p>
                 </template>

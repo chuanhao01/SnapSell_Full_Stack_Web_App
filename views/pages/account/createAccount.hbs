@@ -42,7 +42,9 @@
                     v-model='form.username'
                     type='text'
                     required
-                    placeholder='Username'>
+                    placeholder='Username'
+                    @change='changeInput'
+                    >
                     </b-form-input>
                 </b-form-group>    
                 {{!-- Input for password --}}
@@ -54,9 +56,15 @@
                     v-model='form.password'
                     type='password'
                     required
-                    placeholder='Password'>
+                    placeholder='Password'
+                    @change='changeInput'
+                    >
                     </b-form-input>
                 </b-form-group>
+                {{!-- If creating the account failed --}}
+                <template v-if='create_account_failed'>
+                    <p class="text-danger">Creating account failed try again</p>
+                </template>
                 {{!-- Submit and reset buttons --}}
                 <b-button type="submit" variant="primary">Submit</b-button>
                 <b-button type="reset" variant="danger">Reset</b-button>
@@ -70,14 +78,33 @@
     const app = new Vue({
         el: '#app',
         data: {
+            showForm: true,
             form: {
                 username: '',
                 password: '',
                 avatar_icon: null,
             },
-            showForm: true
+            create_account_failed: false, 
         },
         methods: {
+            // General function for input field changing
+            changeInput(){
+                // We just set the text to not appear
+                this.create_account_failed = false;
+            },
+            // Method called to reset the whole form
+            onReset(event){
+                event.preventDefault();
+                this.form.username = '';
+                this.form.password = '';
+                this.form.avatar_icon = null;
+                //This is to reload the form to make it empty
+                this.showForm = false;
+                Vue.nextTick(() => {
+                    this.showForm = true;
+                });
+            },
+            // API Calls below
             // Method called when form is submitted
             onSubmit(event){
                 event.preventDefault();
@@ -101,7 +128,8 @@
                 )
                 .catch(
                     function(err){
-                        if(err.response.status === 422){
+                        // Old temp code for return codes
+                        /* if(err.response.status === 422){
                             // Wrong file extension given
                             return;
                         }
@@ -112,22 +140,13 @@
                         else if(err.response.status === 403){
                             // Username is already taken
                             return;
-                        }
-                    }
+                        } */
+                        console.log(err);
+                        // Setting the errrors
+                        this.create_account_failed= true;
+                    }.bind(this)
                 );
             },
-            // Method called to reset the whole form
-            onReset(event){
-                event.preventDefault();
-                this.form.username = '';
-                this.form.password = '';
-                this.form.avatar_icon = null;
-                //This is to reload the form to make it empty
-                this.showForm = false;
-                Vue.nextTick(() => {
-                    this.showForm = true;
-                });
-            }
         }
     });
 </script>
