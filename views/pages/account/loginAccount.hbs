@@ -21,7 +21,9 @@
                     v-model='form.username'
                     type='text'
                     required
-                    placeholder='Username'>
+                    placeholder='Username'
+                    :class='form_validation.username'
+                    @change='changeInput(form_validation.username)'>
                     </b-form-input>
                 </b-form-group>    
                 {{!-- Input for password --}}
@@ -33,9 +35,15 @@
                     v-model='form.password'
                     type='password'
                     required
-                    placeholder='Password'>
+                    placeholder='Password'
+                    :class='form_validation.password'
+                    @change='changeInput(form_validation.password)'>
                     </b-form-input>
                 </b-form-group>
+                {{!-- Failed login message --}}
+                <template v-if='login_failed'>
+                    <p class="text-danger">Login failed</p>
+                </template>
                 {{!-- Submit and reset buttons --}}
                 <b-button type="submit" variant="primary">Login</b-button>
             </b-form>
@@ -52,8 +60,25 @@
                 username: '',
                 password: '',
             },
+            form_validation: {
+                // Contains the class binds for form input
+                username: {
+                    'is-invalid': false,
+                },
+                password: {
+                    'is-invalid': false,
+                }
+            },
+            // For server side check if login passed
+            login_failed: false,
         },
         methods: {
+            // General function called when an input is done
+            changeInput(input_class_binding){
+                input_class_binding['is-invalid'] = false;
+                this.login_failed = false;
+            },
+            // Below is for api calls
             // Method called when form is submitted
             onSubmit(event){
                 event.preventDefault();
@@ -67,15 +92,18 @@
                             document.cookie = 'access_token=' + res.data.access_token;
                             document.cookie = 'refresh_token=' + res.data.refresh_token;
                             window.location.pathname = '/user/home';
-                            // Redirect to home page
-                            //window.location.pathname = '/';
                         }
                     )
                     .catch(
                         function(err){
                             console.error(err.response);
+                            // Setting the inputs to true as login failed
+                            this.form_validation.username['is-invalid'] = true;
+                            this.form_validation.password['is-invalid'] = true;
+                            // For the login failed message
+                            this.login_failed = true;
                             return;
-                        }
+                        }.bind(this)
                     );
             },
         }
