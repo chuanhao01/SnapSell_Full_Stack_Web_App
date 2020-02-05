@@ -20,9 +20,16 @@
                     v-model='form.offer_price'
                     type='number'
                     required
-                    placeholder='Offer price'>
+                    placeholder='Offer price'
+                    :class='form_validation.offer_price'
+                    @change='changeInput(form_validation.offer_price)'
+                    >
                     </b-form-input>
                 </b-form-group>
+                {{!-- Add offering failed --}}
+                <template v-if='add_offering_failed'>
+                    <p class="text-danger">Adding offering failed, please try again</p>
+                </template>
                 {{!-- Submit and reset buttons --}}
                 <b-button type="submit" variant="primary">Submit</b-button>
                 <b-button type="reset" variant="danger">Reset</b-button>
@@ -138,8 +145,20 @@
             listing_pictures: [],
             slide: 0,
             sliding: null,
+            // Server side error response 
+            form_validation: {
+                offer_price: {
+                    'is-invalid': false,
+                },
+            },
+            add_offering_failed: false,
         },
         methods:{
+            // General function called when an input is done
+            changeInput(input_class_binding){
+                input_class_binding['is-invalid'] = false;
+                this.add_offering_failed = false;
+            },
             onReset(event){
                 event.preventDefault();
                 this.form.offer_price = null;
@@ -149,6 +168,7 @@
                     this.showForm = true;
                 });
             },
+            // API Calls below
             onSubmit(event){
                 event.preventDefault();
                 const listing_id = window.location.pathname.split("/").pop();
@@ -163,7 +183,10 @@
                 .catch(
                     function(err){
                         console.log(err.response);
-                    }
+                        // If there was any error
+                        this.form_validation.offer_price['is-invalid'] = true;
+                        this.add_offering_failed = true;
+                    }.bind(this)
                 );
             },
             // Loading methods are down here
