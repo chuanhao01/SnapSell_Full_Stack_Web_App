@@ -63,7 +63,7 @@
                 </b-form-group>
                 {{!-- If creating the account failed --}}
                 <template v-if='create_account_failed'>
-                    <p class="text-danger">Creating account failed try again</p>
+                    <p class="text-danger">Creating account failed, please try again</p>
                 </template>
                 {{!-- Submit and reset buttons --}}
                 <b-button type="submit" variant="primary">Submit</b-button>
@@ -129,7 +129,8 @@
                 .catch(
                     function(err){
                         // Old temp code for return codes
-                        /* if(err.response.status === 422){
+                        /*
+                        if(err.response.status === 422){
                             // Wrong file extension given
                             return;
                         }
@@ -140,7 +141,8 @@
                         else if(err.response.status === 403){
                             // Username is already taken
                             return;
-                        } */
+                        } 
+                        */
                         console.log(err);
                         // Setting the errrors
                         this.create_account_failed= true;

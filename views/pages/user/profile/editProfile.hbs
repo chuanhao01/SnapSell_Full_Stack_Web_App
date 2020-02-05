@@ -43,7 +43,8 @@
                         v-model='form.username'
                         type='text'
                         required
-                        placeholder='Username'>
+                        placeholder='Username'
+                        @change='changeInput'>
                         </b-form-input>
                     </b-form-group>    
                     {{!-- Input for password --}}
@@ -55,9 +56,14 @@
                         v-model='form.password'
                         type='password'
                         required
-                        placeholder='Password'>
+                        placeholder='Password'
+                        @change='changeInput'>
                         </b-form-input>
                     </b-form-group>
+                    {{!-- If editing the profile failed --}}
+                    <template v-if='edit_profile_failed'>
+                        <p class="text-danger">Edit profile failed, please try again</p>
+                    </template>
                     {{!-- Submit and reset buttons --}}
                     <b-button type="submit" variant="primary">Submit</b-button>
                     <b-button type="reset" variant="danger">Reset</b-button>
@@ -98,9 +104,29 @@
                 password: '',
                 avatar_icon: null,
             },
-            showForm: true
+            showForm: true,
+            // Checking if there are errors from backend
+            edit_profile_failed: false,
         },
         methods: {
+            // General function for input field changing
+            changeInput(){
+                // We just set the text to not appear
+                this.edit_profile_failed = false;
+            },
+            // Method called to reset the whole form
+            onReset(event){
+                event.preventDefault();
+                this.form.username = '';
+                this.form.password = '';
+                this.form.avatar_icon = null;
+                //This is to reload the form to make it empty
+                this.showForm = false;
+                Vue.nextTick(() => {
+                    this.showForm = true;
+                });
+            },
+            // API Calls below
             getUserDetails(){
                 axios
                 .get('/api/user')
@@ -133,6 +159,8 @@
                 .catch(
                     function(err){
                         console.log(err);
+                        // Old temp code for return codes
+                        /*
                         if(err.response.status === 422){
                             // Wrong file extension given
                             return;
@@ -145,21 +173,11 @@
                             // Username is already taken
                             return;
                         }
-                    }
+                        */
+                        this.edit_profile_failed = true;
+                    }.bind(this)
                 );
             },
-            // Method called to reset the whole form
-            onReset(event){
-                event.preventDefault();
-                this.form.username = '';
-                this.form.password = '';
-                this.form.avatar_icon = null;
-                //This is to reload the form to make it empty
-                this.showForm = false;
-                Vue.nextTick(() => {
-                    this.showForm = true;
-                });
-            }
         },
         created(){
             this.getUserDetails();
