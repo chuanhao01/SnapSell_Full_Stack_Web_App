@@ -109,7 +109,10 @@
                     v-model='form.title'
                     type='text'
                     required
-                    placeholder='Title'>
+                    placeholder='Title'
+                    :class='form_validation.title'
+                    @change='changeInput(form_validation.title)'
+                    >
                     </b-form-input>
                 </b-form-group>
                 {{!-- For the description --}}
@@ -121,7 +124,10 @@
                     v-model='form.description'
                     type='text'
                     required
-                    placeholder='Description'>
+                    placeholder='Description'
+                    :class='form_validation.description'
+                    @change='changeInput(form_validation.description)'
+                    >
                     </b-form-input>
                 </b-form-group>
                 {{!-- For the price --}}
@@ -133,9 +139,16 @@
                     v-model='form.price'
                     type='number'
                     required
-                    placeholder='Price'>
+                    placeholder='Price'
+                    :class='form_validation.price'
+                    @change='changeInput(form_validation.price)'
+                    >
                     </b-form-input>
                 </b-form-group>
+                {{!-- Editing the listing failed --}}
+                <template v-if='edit_listing_failed'>
+                    <p class="text-danger">Edit listing failed, please try again</p>
+                </template>
                 {{!-- Submit and reset buttons --}}
                 <b-button type="submit" variant="primary">Submit</b-button>
                 <b-button type="reset" variant="danger">Reset</b-button>
@@ -158,9 +171,46 @@
             showForm: true,
             // listing_pictures is an arr, returned from the api
             listing_pictures: [],
-            slide: 0
+            slide: 0,
+            // Server side error response 
+            form_validation: {
+                title: {
+                    'is-invalid': false,
+                },
+                description: {
+                    'is-invalid': false,
+                },
+                price: {
+                    'is-invalid': false,
+                },
+            },
+            edit_listing_failed: false,
         },
         methods: {
+            // General function called when an input is done
+            changeInput(input_class_binding){
+                input_class_binding['is-invalid'] = false;
+                this.edit_listing_failed = false;
+            },
+            onReset(event){
+                event.preventDefault();
+                this.form.title= '';
+                this.form.description = '';
+                this.form.price= null;
+                //This is to reload the form to make it empty
+                this.showForm = false;
+                Vue.nextTick(() => {
+                    this.showForm = true;
+                });
+            },
+            // Methods for carousel
+            onSlideStart(slide) {
+                this.sliding = true
+            },
+            onSlideEnd(slide) {
+                this.sliding = false
+            },
+            // API Calls below
             getListing(){
                 const listing_id = window.location.pathname.split("/").pop();
                 axios
@@ -177,32 +227,26 @@
                     }
                 )
             },
-            onReset(event){
-                event.preventDefault();
-                this.form.title= '';
-                this.form.description = '';
-                this.form.price= null;
-                //This is to reload the form to make it empty
-                this.showForm = false;
-                Vue.nextTick(() => {
-                    this.showForm = true;
-                });
-            },
             onSubmit(event){
                 event.preventDefault();
                 const listing_id = window.location.pathname.split("/").pop();
                 axios
                 .put(`/api/listing/${listing_id}`, this.form)
-                .catch(
-                    function(err){
-                        console.log(err.response);
-                    }
-                )
                 .then(
                     function(res){
                         console.log(res);
                         window.location.pathname = `/user/listing/${listing_id}`;
                     }
+                )
+                .catch(
+                    function(err){
+                        console.log(err.response);
+                        // If there was any error
+                        this.form_validation.title['is-invalid'] = true;
+                        this.form_validation.description['is-invalid'] = true;
+                        this.form_validation.price['is-invalid'] = true;
+                        this.edit_listing_failed = true;
+                    }.bind(this)
                 );
             },
             // Getting the rest of the data
@@ -221,13 +265,6 @@
                         console.log(err);
                     }
                 )
-            },
-            // Methods for carousel
-            onSlideStart(slide) {
-                this.sliding = true
-            },
-            onSlideEnd(slide) {
-                this.sliding = false
             },
         },
         created(){
