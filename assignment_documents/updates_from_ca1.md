@@ -199,9 +199,144 @@ The page to allow users to edit their own profile.
 **GET /user/listing**  
 The page to allow the user to look at his own listings  
 
-#### Add a listing
-**GET /user/listing/add** 
-The page to add a listing
+#### View one of your own listings  
+**GET /user/listing/{listing_id}**  
+The page where you get to look more specifically at your own listing.
+
+#### Add a listing  
+**GET /user/listing/add**   
+The page to add a listing  
+
+#### Add a picture to your listing  
+**GET /user/listing/picture/add/{listing_id}**  
+The page to add more pictures to one your own specific listings  
+
+#### Edit the pictures one of your listings has  
+**GET /user/listing/picture/edit/{listing_id}**   
+The page to edit the pictures your listings has.  
+
+#### Edit one of your own listings  
+**GET /user/listing/edit/{listing_id}**  
+The page to edit one of your own listings  
+
+#### Look at all other listings  
+**GET /listings**  
+The page where the user gets to select what listings he want to look at. Note he will not see any of his own listings  
+
+#### Looking at a specific listing  
+**GET /listing/{listing_id}**  
+The page where the user can specifically look at listing he might want to place an offer on. Note, cannot be his own listings.  
+
+#### Place an offer on a listing  
+**GET /listing/offer/{listing_id}**   
+The page for the user to add an offer to a listing.  
+
+#### Edit an existing offer  
+**GET /listing/offer/edit/{listing_id}**  
+The page to edit an offer a user might already have on a listing.  
+
+#### Searching for a listing or user  
+**GET /search?**  
+The page where the user can search for a listing or user.  
+
+---  
+From here on, we will be doing API endpoints, where it might recieve and respond with data, rather than html pages.  
+
+The following do not require the user to be logged in.
+
+#### Creating an account  
+**POST /api/account**    
+The endpoint to create an account.  
+Responds with 201 for success.
+| KEY | Type | Description |
+| --- | ------ | ----------- |
+| avatar_icon | image file | The avatar icon of the user |
+| username | string | The username of the user |
+| password | string | The password of the user in plain text |
+
+#### Login to your account  
+**POST /api/login**   
+The api to send your login credentials to get your `access_token` and `refresh_token`.  
+Responds with 200 for successful login.  
+| KEY | Type | Description |
+| --- | ------ | ----------- |
+| username | string | The username of the user |
+| password | string | The password of the user in plain text |
+
+#### Generate another access_token based on your refresh_token  
+**GET /api/refresh_token**   
+200 success will have the new access_token  
+| KEY | Type | Description |
+| --- | ------ | ----------- |
+| refresh_token | string | The jwt `refresh_token` given when you login |
+
+---
+
+The api endpoints below do require the user to be logged in.
+
+---
+
+#### Get all of your own listings  
+**GET /api/listing**   
+Returns 200 with all of your listings if you are logged in.  
+
+#### Add a listing  
+**POST /api/listing**   
+Status code 201 on success  
+| KEY | Type | Description |
+| --- | ------ | ----------- |
+| title | string | Title of the listing |
+| description | string | Description of the listing |
+| price | float | Price of the listing |
+
+#### Get a specific listing by its id  
+**GET /api/listing/{listing_id}**   
+Status code 200 if the listing is found with the listing data  
+
+#### Edit a listing you own  
+**PUT /api/listing/{listing_id}**   
+If the edit was successful, status code 200 is returned  
+| KEY | Type | Description |
+| --- | ------ | ----------- |
+| title | string | Title of the listing |
+| description | string | Description of the listing |
+| price | float | Price of the listing |
+
+#### Delete a listing  
+**DELETE /api/listing/{listing_id}**   
+Deletes the listing if it belongs to the user making the request  
+
+#### Get the pictures of a listing  
+**GET /api/listing/pictures/{listing_id}/**   
+Returns the data regarding the pictures a listing might have.  
+Could return nothing  
+
+#### Add a picture to a listing   
+**POST /api/listing/pictures/{listing_id}**    
+Code 201 if successful  
+| KEY | Type | Description |
+| --- | ------ | ----------- |
+| listing_picture | image file | The file of the image you want to tag to your listing |
+
+#### Delete a picture of a listing
+**DELETE /api/listing/pictures/{listing_id}**   
+Code 200 on success  
+| KEY | Type | Description |
+| --- | ------ | ----------- |
+| listing_picture | image file | The file of the image you want to tag to your listing |
+| listing_picture_file_name | string | A string of the filename of the image you want to remove from the listing |
+
+#### Get the image file of a listing picture  
+**GET /api/listing/picture/{listing_picture_file_name}**   
+If successful, returns the image file of the picture needed.  
+
+#### Get all others listings  
+**GET /api/other/listing**   
+Gets all the listings that do not belong to the logged in user.  
+
+#### 
+**GET /api/other/listing**   
+Gets all the listings that do not belong to the logged in user.  
 
 
 #### Creating a listing  
