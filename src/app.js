@@ -1,3 +1,6 @@
+// Setting up dotenv enviroment variables
+require('dotenv').config();
+
 // Setting up express and app
 const express = require('express');
 const app = express();
