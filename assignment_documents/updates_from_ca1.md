@@ -165,13 +165,44 @@ As such the file structure is to by how the user may interact with the pages.
 
 ### API reference
 
-Here I will be listing out all the endpoints made and used in the server.
+Here I will be listing out all the endpoints made and used in the server.  
+Endpoints for loading the front-end html  
 
-Endpoints for loading the front-end html
+#### Landing page  
+**GET /**   
+Returns the home landing page of the server  
 
-#### Landing page
-**GET /** 
-Returns the home landing page of the server.  
+#### Login page  
+**GET /login**   
+The normal login page for the user  
+
+#### Account creation page
+**GET /account/create** 
+The page for new users to create an account  
+
+---
+### Below are only accessable to users who are logged in.  
+---
+#### User's home page  
+**GET /user/home**  
+The logged in user's home page.  
+
+#### User's profile page  
+**GET /user/profile**   
+The page for user's to view their own profile.  
+
+####  User's profile edit page  
+**GET /user/profile/edit**   
+The page to allow users to edit their own profile.  
+
+#### Viewing your own listings  
+**GET /user/listing**  
+The page to allow the user to look at his own listings  
+
+#### Add a listing
+**GET /user/listing/add** 
+The page to add a listing
+
 
 #### Creating a listing  
 **POST /api/listings**
