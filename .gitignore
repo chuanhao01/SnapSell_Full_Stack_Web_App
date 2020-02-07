@@ -5,6 +5,5 @@
 /uploads/avatarIcons
 /uploads/listingPictures
 /update.txt
-/back_end_server/node_modules
-/back_end_server/uploads
-/front_end_server/node_modules
+/back_end_server
+/front_end_server
