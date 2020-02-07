@@ -276,6 +276,8 @@ The api endpoints below do require the user to be logged in.
 
 ---
 
+### Listings
+
 #### Get all of your own listings  
 **GET /api/listing**   
 Returns 200 with all of your listings if you are logged in.  
@@ -334,16 +336,101 @@ If successful, returns the image file of the picture needed.
 **GET /api/other/listing**   
 Gets all the listings that do not belong to the logged in user.  
 
-#### 
-**GET /api/other/listing**   
-Gets all the listings that do not belong to the logged in user.  
+### Offers
 
+#### Get the offers of a listing  
+**GET /api/offer/{listing_id}**   
+Returns all the offers related to a listing  
 
-#### Creating a listing  
-**POST /api/listings**
-Creates a listing for the logged in user.
+#### Add an offer to a listing  
+**POST /api/offer/{listing_id}**   
+Adds an offer to a listing if the user does not own the listing.   
+Code 200 when successful
 | KEY | Type | Description |
 | --- | ------ | ----------- |
-| title | string | Title of the listing |
-| description | string | Description of the listing |
-| price | float | Price of the listing |
+| offer_price | float | Price of the listing |
+
+#### Edit an existing offer on a listing  
+**PUT /api/offer/{listing_id}**   
+Edit the offer if the user has placed an offer on the listing before and he also does not own the listing.  
+| KEY | Type | Description |
+| --- | ------ | ----------- |
+| offer_price | float | Price of the listing |
+
+#### Delete's the logged in user's offer on a listing  
+**DELETE /api/offer/{listing_id}**   
+Deletes the offer the logged in user might had have on a listing. He needs to have a listing previously and does not own the listing.  
+
+#### Check if the logged in user has placed an offer on the listing  
+**GET /api/offer/check/{listing_id}**   
+Returns the boolean value if the user has placed an offer on the listing.  
+True &rarr; Has placed an offer.  
+False &rarr; Has not placed an offer.  
+
+#### Get the current offer the user has placed on the listing  
+**GET /api/offer/user/{listing_id}**   
+Will throw error if there is no offer placed.  
+Returns the offer amount made on the listing by the user.  
+
+---  
+### User
+
+#### GET a user's profile  
+**GET /api/user**   
+Gets the logged in user's profile  
+
+#### Edit's the current user profile  
+**PUT /api/user**   
+Returns Code 204 if successful  
+| KEY | Type | Description |
+| --- | ------ | ----------- |
+| avatar_icon | image file | The avatar icon of the user |
+| username | string | The username of the user |
+| password | string | The password of the user in plain text |
+
+#### Get the user avatar icon  
+**GET /api/user/avatar_icon**   
+Returns the logged in user's avatar icon image file.  
+
+#### Get other users data  
+**GET /api/user/other/{user_id}**   
+Returns data on another user if the user_id exists.  
+
+#### Get the avatar icon of other users  
+**GET /api/user/other/{user_id}/avatar_icon**   
+Sends the image file of the user avatar icon if it exists.  
+
+---  
+### Likes
+
+#### Get the information of the likes of a listing   
+**GET /api/like/{listing_id}**   
+The user must own the listing to view this.  
+
+#### Add a like to listing  
+**POST /api/like/{listing_id}**   
+No body is required for this, just need to make sure you are not liking your own listing.  
+Also cannot like a listing you already liked.  
+
+#### Unlike a listing/Delete your like  
+**DELETE /api/like/{listing_id}**   
+Unlikes a listings you have liked before. Cannot unlike a listing you have not liked  
+
+#### Check if you have liked a listing before  
+**GET /api/like/check/{listing_id}**   
+Retuns the boolean value of if you have liked a listing before.  
+Cannot be your own listing.  
+True &rarr; Has liked  
+False &rarr; Has not liked  
+
+---  
+### Search
+
+#### Search for a listing or user  
+**POST /api/search/**   
+Returns the results of the search  
+| KEY | Type | Description |
+| --- | ------ | ----------- |
+| type | string | Type of search, either `listing` or `user` |
+| search | string | search query |
+
