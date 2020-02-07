@@ -1,3 +1,6 @@
 /node_modules
 /startup.sh
 /uploads
+/src
+/back_end_server
+/front_end_server

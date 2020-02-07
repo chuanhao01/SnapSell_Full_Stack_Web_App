@@ -1,8 +1,0 @@
-- Getting started
-  - [Quick start](quick_start/README.md)
-    - Linux
-    - Windows
-    - General setup
-  - [Front-end server](front_end_server/README.md)
-  - [Back-end sever](back_end_server/README.md)
-- API Guide

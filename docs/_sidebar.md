@@ -1,5 +1,4 @@
-- Getting started
-  - [Quick start](quick_start/README.md)
-  - [Front-end server](front_end_server/README.md)
-  - [Back-end sever](back_end_server/README.md)
-- API Guide
+- [Getting Started](getting_started/README.md)
+- API Reference
+- CORS trouble
+- Not using Ubuntu/Errors?
