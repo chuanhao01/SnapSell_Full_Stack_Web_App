@@ -221,8 +221,8 @@ const accountAPIController = {
                             // As the user does not exists
                             console.log(err);
                             res.status(401).send({
-                                'Error': 'User does not exists',
-                                'error_code': err.code
+                                'Error': 'Login failed',
+                                'error_code': 'LOGIN_FAILED'
                             });
                             throw err.code;
                         }
