@@ -113,6 +113,23 @@ Now in the `src` dir, to install all to required node_modules, run,
 npm i
 ```
 
+#### Setting up uploads directory
+Also, inside the project we need to create 2 new folders for our uploads.  
+This is to allow user uploaded images to be locally stored.
+To do this we,  
+
+```bash
+# Make sure you are still in the current src/ directory
+# Make an uploads folder
+mkdir uploads
+# Making the folders avatarIcons and listingPictures inside the uploads folder
+cd uploads/
+mkdir avatarIcons
+mkdir listingPictures
+# cd into the main directory
+cd ..
+```  
+
 ### 3. Running the server  
 Once everything is configured, you can run the server using,  
 ```bash
