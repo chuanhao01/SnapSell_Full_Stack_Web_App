@@ -198,6 +198,7 @@ const offerAPIController = {
                 }
             );
         });
+        // Edit an existing offer
         app.put('/api/offer/:listing_id', function(req, res){
             new Promise((resolve) => {
                 resolve(
