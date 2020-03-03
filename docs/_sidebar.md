@@ -1,4 +1,3 @@
 - [Getting Started](getting_started/README.md)
 - API Reference
-- CORS trouble
 - Not using Ubuntu/Errors?
