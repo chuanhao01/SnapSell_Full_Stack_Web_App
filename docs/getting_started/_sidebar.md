@@ -1,5 +1,5 @@
 - [Getting Started](getting_started/README.md)
   - [Quick Start](getting_started/quick_start.md)
   - [Project Methodology](getting_started/project_method.md)
-- API Reference
+- [API Reference](api_reference.md)
 - Not using Ubuntu/Errors?
