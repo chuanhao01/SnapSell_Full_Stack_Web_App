@@ -34,6 +34,7 @@ Additional, I implemented other features such as:
 - Standard error codes and messages for API end-points
 
 ## [Quick Start](quick_start/README.md)
+
 Look here for the guide on how to set up the server on your machine.
 
 ## Controller, Database and views
