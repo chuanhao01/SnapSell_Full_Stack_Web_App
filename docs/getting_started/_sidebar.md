@@ -1,7 +1,5 @@
 - [Getting Started](getting_started/README.md)
   - [Quick Start](getting_started/quick_start.md)
-  - Controller
-  - Database
-  - Views
+  - [Project Methodology](getting_started/project_method.md)
 - API Reference
 - Not using Ubuntu/Errors?
