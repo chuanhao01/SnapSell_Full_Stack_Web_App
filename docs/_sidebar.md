@@ -1,3 +1,3 @@
 - [Getting Started](getting_started/README.md)
-- API Reference
+- [API Reference](api_reference.md)
 - Not using Ubuntu/Errors?

@@ -37,6 +37,6 @@ Additional, I implemented other features such as:
 
 Look here for the guide on how to set up the server on your machine.
 
-## Controller, Database and views
+## Project Methodology
 
-An overview of how these sections work.
+An overview of how the project was built and how it runs.
