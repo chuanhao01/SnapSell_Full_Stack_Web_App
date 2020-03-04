@@ -1,13 +1,9 @@
-Libraries installed
+# Full_Stack_Web_App  
 
-Full_Stack_Web_App@1.0.0 /home/chuanhao01/My_Folder/Github/Full_Stack_Web_App  
-├── body-parser@1.19.0  
-├── express@4.17.1  
-├── express-handlebars@3.1.0  
-├── jsonwebtoken@8.5.1  
-├── moment@2.24.0  
-├── multer@1.4.2  
-├── mysql@2.17.1  
-├── nodemon@2.0.1  
-└── uuid@3.3.3  
+## What is this
 
+Hi again, this time, this project was a Full Stack Web App I made as part of my assignment for the module, **ST0503 : BACK-END WEB DEVELOPMENT** in Singapore Polytechnic.  
+If you want to check out the other projects I did as part of my school assignments, you can check out the repo [here](https://github.com/chuanhao01/Public_SP)  
+Therefore, the main purpose of this repo is to mainly serve as an archive as well as some basic API documentation.  
+
+To see the full documentation, click [here](https://chuanhao01.github.io/Full_Stack_Web_App/docs/#/).
