@@ -1,5 +1,5 @@
-- Getting Started
-  - [Quick Start](quick_start/README.md)
+- [Getting Started](getting_started/README.md)
+  - [Quick Start](getting_started/quick_start.md)
   - Controller
   - Database
   - Views

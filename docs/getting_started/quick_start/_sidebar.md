@@ -1,7 +1,0 @@
-- Getting Started
-  - Quick Start
-  - Controller
-  - Database
-  - Views
-- API Reference
-- Not using Ubuntu/Errors?
