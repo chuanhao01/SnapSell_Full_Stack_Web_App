@@ -11,7 +11,7 @@ Here are some general descriptions of the sections and quick links for you too r
 #### [Getting Started](getting_started/README.md)
 This section talks about the assignment specs and what I did, as well as about the project itself.  
 
-#### [API Reference]()
+#### [API Reference](api_reference.md)
 This section talks about the API references to the endpoints created by the server in the project.  
 
 #### [Not using Ubuntu/Errors?]()
