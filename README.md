@@ -1,4 +1,4 @@
-# Full_Stack_Web_App  
+# SnapSell Full_Stack_Web_App  
 
 ## What is this
 
