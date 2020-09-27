@@ -1,5 +1,7 @@
 # SnapSell Full_Stack_Web_App  
 
+**This project has been archived as of 27/09/2020**
+
 ## What is this
 
 Hi again, this time, this project was a Full Stack Web App I made as part of my assignment for the module, **ST0503 : BACK-END WEB DEVELOPMENT** in Singapore Polytechnic.  
